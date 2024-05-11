@@ -3286,6 +3286,17 @@ function SMODS.INIT.Bunco()
         original_blind_debuff_card(self, card, from_blind)
     end
 
+    local original_game_update_shop = Game.update_shop
+
+    function Game:update_shop(dt)
+        if G.GAME.shop_skip == true then
+            G.STATE = G.STATES.BLIND_SELECT
+            return false
+        end
+
+        return original_game_update_shop(self, dt)
+    end
+
     -- Blind appearance (\BL_APP)
 
     local original_get_new_boss = get_new_boss
@@ -3313,6 +3324,12 @@ function SMODS.INIT.Bunco()
             end
         end
 
+        if boss == 'bl_final_trident' then
+            G.GAME.shop_skip = true
+        else
+            G.GAME.shop_skip = false
+        end
+
         return boss
     end
 
@@ -3334,6 +3351,23 @@ function SMODS.INIT.Bunco()
         false, -- Discovered
         'chartreusecrown') -- Atlas
     ChartreuseCrown:register()
+
+    SMODS.Sprite:new('vermiliontrident', bunco_mod.path, 'VermilionTrident.png', 34, 34, 'animation_atli', 21):register()
+    local VermilionTrident = SMODS.Blind:new(
+        'Vermilion Trident', -- Name
+        'final_trident', -- Slug
+        {name = '朱红三叉戟',
+        text = {'本底注内禁用商店'}},
+        8, -- Reward
+        2, -- Multiplier
+        {}, -- Vars
+        {}, -- Debuff
+        {x = 0, y = 0}, -- Sprite position
+        {showdown = true, min = 10, max = 10}, -- Boss antes
+        HEX('db481e'), -- Color
+        false, -- Discovered
+        'vermiliontrident') -- Atlas
+    VermilionTrident:register()
 
 end
 
