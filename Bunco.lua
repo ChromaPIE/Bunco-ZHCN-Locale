@@ -1253,7 +1253,7 @@ function SMODS.INIT.Bunco()
     function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 
          -- Doorhanger Joker additional function (\DOOR_FUN)
-         -- I do not create card immideately for this one because of the sound Jokers make when they have edition
+         -- I do not create card immedeately for this one because of the sound Jokers make when they have edition
 
         if G.jokers ~= nil then
             for _, v in ipairs(G.jokers.cards) do
@@ -1720,7 +1720,7 @@ function SMODS.INIT.Bunco()
         {}, -- Config
         {x = 4, y = 0}, -- Sprite position
         loc_crop, -- Localization
-        2, -- Rarity
+        1, -- Rarity
         4, -- Cost
         nil, -- Unlocked
         false, -- Discovered
@@ -1865,14 +1865,14 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_dread.calculate = function(self, context)
 
-        if context.full_hand ~= nil and context.full_hand then
+        if context.full_hand ~= nil and context.full_hand[1] and not context.other_card and not context.blueprint then
             self.ability.extra.trash_list = {}
             for k, v in ipairs(context.full_hand) do
                 table.insert(self.ability.extra.trash_list, v)
             end
         end
 
-        if context.after and G.GAME.current_round.hands_left == 0 and context.scoring_name ~= nil then
+        if context.after and G.GAME.current_round.hands_left == 0 and context.scoring_name ~= nil and not context.blueprint then
 
             level_up_hand(self, context.scoring_name, true, 2)
 
@@ -1889,6 +1889,7 @@ function SMODS.INIT.Bunco()
                     for i = 1, #self.ability.extra.trash_list do
                         self.ability.extra.trash_list[i].destroyed = true
                         self.ability.extra.trash_list[i]:start_dissolve(nil, nil, 3)
+                        self.ability.extra.trash_list[i].destroyed = true
                     end
                     self.ability.extra.trash_list = {}
 
@@ -2053,7 +2054,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '放高利贷者',
         ['text'] = {
             [1] = '得到此牌时',
-            [2] = '获得{C:money}$50'
+            [2] = '获得{C:money}$50……'
         }
     }
 
@@ -2179,7 +2180,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '小丑骑士',
         ['text'] = {
             [1] = '选择{C:attention}盲注{}时',
-            [2] = '洗乱所有小丑牌并获得{C:red}+4{}倍率',
+            [2] = '洗乱所有小丑牌并获得{C:red}+6{}倍率',
             [3] = '调整顺序将导致倍率重置',
             [4] = '{C:inactive}（当前为{C:red}+#1#{C:inactive}倍率）'
         }
@@ -2205,7 +2206,7 @@ function SMODS.INIT.Bunco()
     SMODS.Jokers.j_knight.calculate = function(self, context)
 
         if context.setting_blind and not self.getting_sliced and not context.blueprint then
-            self.ability.extra.mult = self.ability.extra.mult + 4
+            self.ability.extra.mult = self.ability.extra.mult + 6
 
             G.E_MANAGER:add_event(Event({ trigger = 'after', delay = 0.2, func = function()
                 G.E_MANAGER:add_event(Event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 0.85);return true end })) 
@@ -2334,7 +2335,7 @@ function SMODS.INIT.Bunco()
         {extra = {xmult = 2.5}}, -- Config
         {x = 3, y = 2}, -- Sprite position
         loc_dogs, -- Localization
-        1, -- Rarity
+        2, -- Rarity
         5, -- Cost
         nil, -- Unlocked
         false, -- Discovered
@@ -2452,9 +2453,9 @@ function SMODS.INIT.Bunco()
     local loc_carnival = {
         ['name'] = '嘉年华',
         ['text'] = {
-            [1] = '击败底注时',
-            [2] = '重新开始该底注',
-            [3] = '仅对每个底注生效一次'
+            [1] = '击败底注时，摧毁右侧的',
+            [2] = '小丑牌并倒退一个底注',
+            [3] = '{s:0.8,C:attention}仅对每个底注生效一次'
         }
     }
 
@@ -2475,7 +2476,7 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_carnival.calculate = function(self, context)
 
-        if context.end_of_round and G.GAME.blind.boss and not context.other_card then
+        if context.end_of_round and G.GAME.blind.boss and not context.other_card and not context.blueprint then
 
             local function has_value(tab, val)
                 for index, value in ipairs(tab) do
@@ -2486,10 +2487,21 @@ function SMODS.INIT.Bunco()
                 return false
             end
 
-            if not has_value(self.ability.extra.ante_list, G.GAME.round_resets.ante) then
-                ease_ante(-1)
+            local my_pos = nil
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == self then my_pos = i; break end
+            end
 
-                forced_message('Loop!', self, G.C.BLACK)
+            if my_pos and G.jokers.cards[my_pos+1] and not self.getting_sliced and not G.jokers.cards[my_pos+1].ability.eternal and not G.jokers.cards[my_pos+1].getting_sliced then
+                if not has_value(self.ability.extra.ante_list, G.GAME.round_resets.ante) then
+                    local sliced_card = G.jokers.cards[my_pos+1]
+                    sliced_card.getting_sliced = true
+                    self:juice_up(0.8, 0.8)
+                    ease_ante(-1)
+                    forced_message('再玩一把！', self, G.C.BLACK)
+                    sliced_card:start_dissolve({HEX("57ecab")}, nil, 1.6)
+                    play_sound('slice1', 0.96+math.random()*0.08)
+                end
             end
 
             table.insert(self.ability.extra.ante_list, G.GAME.round_resets.ante)
@@ -2648,9 +2660,10 @@ function SMODS.INIT.Bunco()
     local loc_fingerprints = {
         ['name'] = '指纹档案',
         ['text'] = {
-            [1] = '每回合最后一次出牌中的',
-            [2] = '每张牌在计分时获得{C:chips}+#1#{}筹码',
-            [3] = 'bonus resets each final hand of round'
+            [1] = '每回合{C:attention}最后一次出牌{}',
+            [2] = '中的每张牌在计分时',
+            [3] = '获得临时的{C:chips}+#1#{}筹码',
+            [4] = '加成仅持续一回合'
         }
     }
 
@@ -2660,7 +2673,7 @@ function SMODS.INIT.Bunco()
         {extra = {bonus = 50, new_card_list = {}, old_card_list = {}}}, -- Config
         {x = 5, y = 3}, -- Sprite position
         loc_fingerprints, -- Localization
-        3, -- Rarity
+        2, -- Rarity
         8, -- Cost
         nil, -- Unlocked
         false, -- Discovered
@@ -3302,6 +3315,15 @@ function SMODS.INIT.Bunco()
             end
         end
 
+        if self.debuff and not self.disabled and card.area ~= G.jokers then
+            if self.name == 'The Flame' then
+                if card.config.center ~= G.P_CENTERS.c_base then
+                    card:set_debuff(true)
+                    return
+                end
+            end
+        end
+
         original_blind_debuff_card(self, card, from_blind)
     end
 
@@ -3446,6 +3468,32 @@ function SMODS.INIT.Bunco()
         end
 
         original_blind_debuff_hand(self, cards, hand, handname, check)
+    end
+
+    local original_blind_press_play = Blind.press_play
+
+    function Blind:press_play()
+        original_blind_press_play(self)
+
+        if self.name == 'The Bulwark' then
+            if G.FUNCS.get_poker_hand_info(G.hand.highlighted) == G.GAME.current_round.most_played_poker_hand then
+                G.E_MANAGER:add_event(Event({ func = function()
+                    G.hand.config.highlighted_limit = math.huge
+                    if G.hand.cards then
+                        for k, v in ipairs(G.hand.cards) do
+                            G.hand:add_to_highlighted(v, true)
+                            if k <= 3 then
+                                play_sound('card1', 1)
+                            end
+                        end
+                        G.hand.config.highlighted_limit = config.highlight_limit or 5
+                        G.FUNCS.discard_cards_from_highlighted(nil, true)
+                    end
+                return true end }))
+                self.triggered = true
+                delay(0.7)
+            end
+        end
     end
 
     -- Blind appearance (\BL_APP)
@@ -3607,6 +3655,40 @@ function SMODS.INIT.Bunco()
         'themask') -- Atlas
     TheMask:register()
 
+    SMODS.Sprite:new('theflame', bunco_mod.path, 'TheFlame.png', 34, 34, 'animation_atli', 21):register()
+    local TheFlame = SMODS.Blind:new(
+        'The Flame', -- Name
+        'flame', -- Slug
+        {name = '火焰',
+        text = {'所有增强卡牌', '都被削弱'}},
+        5, -- Reward
+        2, -- Multiplier
+        {}, -- Vars
+        {}, -- Debuff
+        {x = 0, y = 0}, -- Sprite position
+        {min = 3, max = 10}, -- Boss antes
+        HEX('9b2d49'), -- Color
+        false, -- Discovered
+        'theflame') -- Atlas
+    TheFlame:register()
+
+    SMODS.Sprite:new('thebulwark', bunco_mod.path, 'TheBulwark.png', 34, 34, 'animation_atli', 21):register()
+    local TheBulwark = SMODS.Blind:new(
+        'The Bulwark', -- Name
+        'bulwark', -- Slug
+        {name = '堡垒',
+        text = {'打出#1#', '将导致所有手牌被丢弃'}},
+        5, -- Reward
+        2, -- Multiplier
+        {}, -- Vars
+        {}, -- Debuff
+        {x = 0, y = 0}, -- Sprite position
+        {min = 2, max = 10}, -- Boss antes
+        HEX('672f69'), -- Color
+        false, -- Discovered
+        'thebulwark') -- Atlas
+    TheBulwark:register()
+
     SMODS.Sprite:new('chartreusecrown', bunco_mod.path, 'ChartreuseCrown.png', 34, 34, 'animation_atli', 21):register()
     local ChartreuseCrown = SMODS.Blind:new(
         'Chartreuse Crown', -- Name
@@ -3657,11 +3739,31 @@ function SMODS.INIT.Bunco()
         original_blind_set_text(self)
         if self.config.blind then
             if not self.disabled then
-                local loc_vars = nil
                 if self.name == 'The Mask' then
+                    local loc_vars = nil
                     loc_vars = {
                     localize(G.GAME.current_round.most_played_poker_hand, 'poker_hands'),
                     localize(G.GAME.current_round.least_played_poker_hand, 'poker_hands')}
+
+                    local loc_target = localize{type = 'raw_descriptions', key = self.config.blind.key, set = 'Blind', vars = loc_vars or self.config.blind.vars}
+                    if loc_target then
+                        self.loc_name = self.name == '' and self.name or localize{type ='name_text', key = self.config.blind.key, set = 'Blind'}
+                        self.loc_debuff_text = ''
+                        for k, v in ipairs(loc_target) do
+                            self.loc_debuff_text = self.loc_debuff_text..v..(k <= #loc_target and ' ' or '')
+                        end
+                        self.loc_debuff_lines[1] = loc_target[1] or ''
+                        self.loc_debuff_lines[2] = loc_target[2] or ''
+                    else
+                        self.loc_name = ''; self.loc_debuff_text = ''
+                        self.loc_debuff_lines[1] = ''
+                        self.loc_debuff_lines[2] = ''
+                    end
+                end
+                if self.name == 'The Bulwark' then
+                    local loc_vars = nil
+                    loc_vars = {
+                    localize(G.GAME.current_round.most_played_poker_hand, 'poker_hands')}
 
                     local loc_target = localize{type = 'raw_descriptions', key = self.config.blind.key, set = 'Blind', vars = loc_vars or self.config.blind.vars}
                     if loc_target then
@@ -3964,7 +4066,9 @@ function Card.generate_UIBox_ability_table(self)
             -- KNOCKOUT!
         elseif self.ability.name == 'Fiendish Joker' then -- Fiendish Joker localization (\FIEN_LOC)
             loc_vars = {G.GAME.probabilities.normal, self.ability.extra.odds}
-        elseif self.ability.name == 'Envvious Joker' then -- Envvious Joker localization (\ENVI_LOC)
+        elseif self.ability.name == 'Carnival' then -- Carnival Joker localization (\FIEN_LOC)
+            -- Loop!
+        elseif self.ability.name == 'Envvious Joker' then -- Envious Joker localization (\ENVI_LOC)
             loc_vars = {self.ability.extra.mult}
         elseif self.ability.name == 'Proud Joker' then -- Proud Joker localization (\PROU_LOC)
             loc_vars = {self.ability.extra.mult}
