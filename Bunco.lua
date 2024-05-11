@@ -35,7 +35,7 @@
 --
 -- Ver 1 Jokers: Cassette (CASS), Mosaic (MOSA), Voxel (VOXE), Crop Circles (CROP), X-Ray (XRAY), Dread (DREA), Prehistoric (PREH),
 -- Ver 2: Linocut (LINO), Ghost Print (GHOS), Loan Shark (LOAN), Basement (BASE), Shepherd (SHEP), Knight (KNIG), JM & JB (JMJB),
--- Dogs Playing Poker (DOGS), Righthook (RIGH), Fiendish (FIEN), Carnival (CARN), Envious (ENVI), Proud (PROU)
+-- Dogs Playing Poker (DOGS), Righthook (RIGH), Fiendish (FIEN), Carnival (CARN), Envvious (ENVI), Proud (PROU)
 -- Ver 3: Sledgehammer (SLED), Doorhanger (DOOR), Fingerprints (FING), Zealous (ZEAL), Lurid (LURI), The Dynasty (DYNA),
 -- Starfruit (STAR), Wishalloy (WISH), Unobtanium (UNOB), Fondue (FOND), Myopia (MYOP), Astigmatism (ASTI), Magic Wand (MAGI), Rigoletto (RIGO)
 -- Disabled: Jimbo (JIMB)
@@ -62,7 +62,7 @@ function SMODS.INIT.Bunco()
     exotic_table = {
         'The Sky',
         'The Abyss',
-        'Envious Joker',
+        'Envvious Joker',
         'Proud Joker',
         'Zealous Joker',
         'Lurid Joker',
@@ -583,16 +583,21 @@ function SMODS.INIT.Bunco()
     end
 
     -- Exotic cards Planets (\EX_PLA):
-
-        local c_quaoar = SMODS.Planet:new('Quaoar', 'quaoar', { hand_type = 'Spectrum', softlock = true }, { x = 0, y = 0 }, nil, 3, 1,
+        local planet_loc_text = {
+            [1] = '（等级#1#）',
+		    [2] = '升级{C:attention}#2#',
+		    [3] = '{C:mult}+#3#{}倍率并且',
+		    [4] = '{C:chips}+#4#{}筹码'
+        }
+        local c_quaoar = SMODS.Planet:new('Quaoar', 'quaoar', { hand_type = 'Spectrum', softlock = true }, { x = 0, y = 0 }, { name = '创神星', text = planet_loc_text }, 3, 1,
         nil, 1, true, false, 'bunco_planets')
     local c_haumea = SMODS.Planet:new('Haumea', 'haumea', { hand_type = 'Straight Spectrum', softlock = true }, { x = 1, y = 0 },
-        nil, 3, 1, nil, 1, true, false, 'bunco_planets')
+        { name = '妊神星', text = planet_loc_text }, 3, 1, nil, 1, true, false, 'bunco_planets')
     local c_sedna = SMODS.Planet:new('Sedna', 'sedna', { hand_type = 'Spectrum House', softlock = true },
-        { x = 2, y = 0 }, nil, 3, 1,
+        { x = 2, y = 0 }, { name = '赛德娜星', text = planet_loc_text }, 3, 1,
         nil, 1, true, false, 'bunco_planets')
     local c_makemake = SMODS.Planet:new('Makemake', 'makemake', { hand_type = 'Spectrum Five', softlock = true },
-        { x = 3, y = 0 }, nil, 3, 1, nil, 1, true, false, 'bunco_planets')
+        { x = 3, y = 0 }, { name = '鸟神星', text = planet_loc_text }, 3, 1, nil, 1, true, false, 'bunco_planets')
     c_quaoar:register()
     c_haumea:register()
     c_sedna:register()
@@ -601,14 +606,14 @@ function SMODS.INIT.Bunco()
     -- Exotic cards Tarots (\EX_TAR):
 
     local text_tarot_sky = { -- Sky (Fleuron) tarot
-        [1] = 'Converts up to',
-        [2] = '{C:attention}3{} selected cards',
-        [3] = 'to {C:fleurons}Fleurons{}',
+        [1] = '将最多{C:attention}3{}张',
+        [2] = '选定卡牌',
+        [3] = '转换为{C:fleurons}印花'
     }
 
     local tarot_sky = SMODS.Tarot:new('The Sky', 'sky', {max_highlighted = 3},
     { x = 0, y = 0 },
-    { name = 'The Sky', text = text_tarot_sky }, 3, 1, '', true, false, 'bunco_tarots')
+    { name = '天空', text = text_tarot_sky }, 3, 1, '', true, false, 'bunco_tarots')
 
     tarot_sky:register()
 
@@ -1593,11 +1598,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_mosaic', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_mosaic = {
-        ['name'] = 'Mosaic Joker',
+        ['name'] = '拼花瓷砖小丑',
         ['text'] = {
-            [1] = 'Played {C:attention}Stone Cards',
-            [2] = 'give {C:mult}+#1#{} Mult',
-            [3] = 'when scored'
+            [1] = '打出的{C:attention}石头牌',
+            [2] = '在计分时',
+            [3] = '给予{C:mult}+#1#{}倍率'
         }
     }
 
@@ -1631,11 +1636,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_voxel', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_voxel = {
-        ['name'] = 'Voxel Joker',
+        ['name'] = '体素小丑',
         ['text'] = {
-            [1] = '{X:mult,C:white}X#1#{} Mult, {X:mult,C:white}-X0.1{} Mult for each',
-            [2] = '{C:attention}Enhanced card{} in your full deck',
-            [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
+            [1] = '{X:mult,C:white}X#1#{}倍率',
+            [2] = '完整牌组中的每张',
+            [3] = '{C:attention}增强卡牌{}使倍率{X:mult,C:white}-X0.1',
+            [4] = '{C:inactive}（当前为{X:mult,C:white}X#2#{C:inactive}倍率）'
         }
     }
 
@@ -1675,12 +1681,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_crop', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_crop = {
-        ['name'] = 'Crop Circles',
+        ['name'] = '麦田怪圈',
         ['text'] = {
-            [1] = '{C:fleurons}Fleurons{} give {C:mult}+4{} Mult,',
-            [2] = '{C:clubs}Clubs{} give {C:mult}+3{} Mult,',
-            [3] = '8 give {C:mult}+2{} Mult,',
-            [4] = 'Q, 10, 9, 6 give {C:mult}+1{} Mult'
+            [1] = '{C:fleurons}印花{}牌给予{C:mult}+4{}倍率，',
+            [2] = '{C:clubs}梅花{}牌给予{C:mult}+3{}倍率，',
+            [3] = '8给予{C:mult}+2{}倍率，',
+            [4] = 'Q、10、9、6给予{C:mult}+1{}倍率'
         }
     }
 
@@ -1754,11 +1760,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_xray', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_xray = {
-        ['name'] = 'X-Ray',
+        ['name'] = 'X光',
         ['text'] = {
-            [1] = 'Gains {X:mult,C:white}X0.2{} Mult',
-            [2] = 'per card drawn face down',
-            [3] = '{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)'
+            [1] = '抽到背面向上的牌时',
+            [2] = '获得{X:mult,C:white} X0.2 {}倍率',
+            [3] = '{C:inactive}（当前为{X:mult,C:white} X#1# {C:inactive}倍率）'
         }
     }
 
@@ -1876,12 +1882,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_prehistoric', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_prehistoric = {
-        ['name'] = 'Prehistoric Joker',
+        ['name'] = '史前小丑',
         ['text'] = {
-            [1] = '{C:mult}+#1#{} Mult for each card',
-            [2] = 'of the same rank and suit',
-            [3] = 'that was already played',
-            [4] = 'during this round'
+            [1] = '每张和本回合',
+            [2] = '已打出过的牌',
+            [3] = '点数和花色均相同的牌',
+            [4] = '{C:mult}+#1#{}倍率'
         }
     }
 
@@ -1930,12 +1936,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_linocut', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_linocut = {
-        ['name'] = 'Linocut Joker',
+        ['name'] = '雕版印刷小丑',
         ['text'] = {
-            [1] = 'When playing a {C:attention}Pair,',
-            [2] = 'convert the suit of the {C:attention}left{} card',
-            [3] = 'into the suit of the {C:attention}right{} card',
-            [4] = '{C:inactive}(Drag to rearrange)'
+            [1] = '打出{C:attention}对子{}时',
+            [2] = '将{C:attention}左侧{}卡牌的花色',
+            [3] = '变为{C:attention}右侧{}卡牌的花色',
+            [4] = '{C:inactive}（你可以拖动来改变位置）'
         }
     }
 
@@ -1973,11 +1979,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_ghostprint', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_ghostprint = {
-        ['name'] = 'Ghost Print',
+        ['name'] = '印刷残影',
         ['text'] = {
-            [1] = 'Grants Chips and Mult',
-            [2] = 'from last hand type played',
-            [3] = '{C:inactive}(Last poker hand: #1#)'
+            [1] = '获得上一次打出牌型',
+            [2] = '的基底筹码和倍率',
+            [3] = '{C:inactive}（上一次出牌为#1#）'
         }
     }
 
@@ -2019,10 +2025,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_loanshark', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_loanshark = {
-        ['name'] = 'Loan Shark',
+        ['name'] = '放高利贷者',
         ['text'] = {
-            [1] = 'Grants {C:money}$50',
-            [2] = 'when acquired'
+            [1] = '得到此牌时',
+            [2] = '获得{C:money}$50'
         }
     }
 
@@ -2100,11 +2106,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_shepherd', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_shepherd = {
-        ['name'] = 'Shepherd Joker',
+        ['name'] = '牧羊犬小丑',
         ['text'] = {
-            [1] = 'Gains {C:chips}+6{} Chips',
-            [2] = 'when played hand contains a {C:attention}Pair',
-            [3] = '{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)'
+            [1] = '打出的牌包含{C:attention}对子{}时',
+            [2] = '获得{C:chips}+6{}筹码',
+            [3] = '{C:inactive}（当前为{C:chips}+#1#{C:inactive}筹码）'
         }
     }
 
@@ -2151,12 +2157,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_knight', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_knight = {
-        ['name'] = 'Joker Knight',
+        ['name'] = '小丑骑士',
         ['text'] = {
-            [1] = 'When {C:attention}Blind{} is selected,',
-            [2] = 'shuffles all Jokers and gains {C:red}+4{} Mult,',
-            [3] = 'resets when any Joker is rearranged',
-            [4] = '{C:inactive}(Currently {C:red}+#1#{C:inactive} Mult)'
+            [1] = '选择{C:attention}盲注{}时',
+            [2] = '洗乱所有小丑牌并获得{C:red}+4{}倍率',
+            [3] = '调整顺序将导致倍率重置',
+            [4] = '{C:inactive}（当前为{C:red}+#1#{C:inactive}倍率）'
         }
     }
 
@@ -2295,10 +2301,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_dogs', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_dogs = {
-        ['name'] = 'Dogs Playing Poker',
+        ['name'] = '玩扑克的狗',
         ['text'] = {
-            [1] = '{X:mult,C:white}X#1#{} Mult if all scored',
-            [2] = 'cards are {C:attention}2{}, {C:attention}3{}, {C:attention}4{}, or {C:attention}5{}'
+            [1] = '如果所有计分的牌均为',
+            [2] = '{C:attention}2{}、{C:attention}3{}、{C:attention}4{}或{C:attention}5{}',
+            [3] = '{X:mult,C:white}X#1#{}倍率'
         }
     }
 
@@ -2424,12 +2431,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_carnival', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_carnival = {
-        ['name'] = 'Carnival',
+        ['name'] = '嘉年华',
         ['text'] = {
-            [1] = 'After beating Ante,',
-            [2] = 'go one Ante back,',
-            [3] = 'will not work on',
-            [4] = 'the same Ante twice'
+            [1] = '击败底注时',
+            [2] = '重新开始该底注',
+            [3] = '仅对每个底注生效一次'
         }
     }
 
@@ -2471,24 +2477,24 @@ function SMODS.INIT.Bunco()
         end
     end
 
-    -- Envious Joker (\ENVI_BAS):
-    SMODS.Sprite:new('j_envious', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
+    -- Envvious Joker (\ENVI_BAS):
+    SMODS.Sprite:new('j_envvious', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
-    local loc_envious = {
-        ['name'] = 'Envious Joker',
+    local loc_envvious = {
+        ['name'] = '妒忌小丑',
         ['text'] = {
-            [1] = 'Played cards with',
-            [2] = '{C:fleurons}Fleuron{} suit give',
-            [3] = '{C:mult}+#1#{} Mult when scored'
+            [1] = '打出的',
+            [2] = '{C:fleurons}印花{}花色牌',
+            [3] = '在计分时给予{C:mult}+#1#{}倍率'
         }
     }
 
-    local joker_envious = SMODS.Joker:new(
-        'Envious Joker', -- Name
-        'envious', -- Slug
+    local joker_envvious = SMODS.Joker:new(
+        'Envvious Joker', -- Name
+        'envvious', -- Slug
         {extra = {mult = 12}}, -- Config
         {x = 1, y = 3}, -- Sprite position
-        loc_envious, -- Localization
+        loc_envvious, -- Localization
         1, -- Rarity
         5, -- Cost
         nil, -- Unlocked
@@ -2496,9 +2502,9 @@ function SMODS.INIT.Bunco()
         true, -- Blueprint compat
         true) -- Eternal compat
 
-    joker_envious:register()
+    joker_envvious:register()
 
-    SMODS.Jokers.j_envious.calculate = function(self, context)
+    SMODS.Jokers.j_envvious.calculate = function(self, context)
 
         if context.individual and context.cardarea == G.play and context.other_card:is_suit('Fleurons') then
             return {
@@ -2517,11 +2523,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_proud', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_proud = {
-        ['name'] = 'Proud Joker',
+        ['name'] = '骄傲小丑',
         ['text'] = {
-            [1] = 'Played cards with',
-            [2] = '{C:halberds}Halberd{} suit give',
-            [3] = '{C:mult}+#1#{} Mult when scored'
+            [1] = '打出的',
+            [2] = '{C:halberds}斧枪{}花色牌',
+            [3] = '在计分时给予{C:mult}+#1#{}倍率'
         }
     }
 
@@ -2559,10 +2565,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_sledgehammer', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_sledgehammer = {
-        ['name'] = 'Sledgehammer',
+        ['name'] = '大锤八十',
         ['text'] = {
-            [1] = '{C:attention}Glass Cards{} give {X:mult,C:white}X3{} Mult',
-            [2] = 'and guaranteed to break'
+            [1] = '{C:attention}玻璃牌{}会给予{X:mult,C:white}X3{}倍率',
+            [2] = '且必定摧毁'
         }
     }
 
@@ -2589,11 +2595,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_doorhanger', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_doorhanger = {
-        ['name'] = 'Doorhanger',
+        ['name'] = '“请勿打扰”',
         ['text'] = {
-            [1] = 'Disables {C:blue}Common{} Jokers',
-            [2] = 'from appearing',
-            [3] = '{s:0.8}different rarities appear instead'
+            [1] = '{C:blue}普通{}小丑不会再出现',
+            [2] = '{s:0.8}其他稀有度的小丑将取而代之'
         }
     }
 
@@ -2622,10 +2627,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_fingerprints', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_fingerprints = {
-        ['name'] = 'Fingerprints',
+        ['name'] = '指纹档案',
         ['text'] = {
-            [1] = 'Cards played on the final hand of round',
-            [2] = 'gain {C:chips}+#1#{} Chips when scored,',
+            [1] = '每回合最后一次出牌中的',
+            [2] = '每张牌在计分时获得{C:chips}+#1#{}筹码',
             [3] = 'bonus resets each final hand of round'
         }
     }
@@ -2952,10 +2957,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_myopia', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_myopia = {
-        ['name'] = 'Myopia',
+        ['name'] = '近视',
         ['text'] = {
-            [1] = '{C:spades}Spades{} and {C:clubs}Clubs{}',
-            [2] = 'count as {C:halberds}Halberds'
+            [1] = '{C:spades}黑桃{}和{C:clubs}梅花{}牌',
+            [2] = '均视为{C:halberds}斧枪{}牌'
         }
     }
 
@@ -2984,10 +2989,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_astigmatism', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_astigmatism = {
-        ['name'] = 'Astigmatism',
+        ['name'] = '散光',
         ['text'] = {
-            [1] = '{C:hearts}Hearts{} and {C:diamonds}Diamonds{}',
-            [2] = 'count as {C:fleurons}Fleurons'
+            [1] = '{C:hearts}红桃{}和{C:diamonds}方片{}牌',
+            [2] = '均视作{C:fleurons}印花{}牌'
         }
     }
 
@@ -3070,11 +3075,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_rigoletto', bunco_mod.path, 'Rigoletto.png', 71, 95, 'asset_atli'):register()
 
     local loc_rigoletto = {
-        ['name'] = 'Rigoletto',
+        ['name'] = '里戈莱托',
         ['text'] = {
-            [1] = 'Each scored card permanently',
-            [2] = 'gains {C:red}+4{} Mult if played hand',
-            [3] = 'contains {C:halberds}Halberd{} or {C:fleurons}Fleuron'
+            [1] = '如果打出的牌中',
+            [2] = '包含{C:halberds}斧枪{}或{C:fleurons}印花{}花色',
+            [3] = '则每张计分的牌',
+            [4] = '永久获得{C:red}+4{}倍率'
         }
     }
 
@@ -3385,7 +3391,7 @@ function Card.generate_UIBox_ability_table(self)
             -- KNOCKOUT!
         elseif self.ability.name == 'Fiendish Joker' then -- Fiendish Joker localization (\FIEN_LOC)
             loc_vars = {G.GAME.probabilities.normal, self.ability.extra.odds}
-        elseif self.ability.name == 'Envious Joker' then -- Envious Joker localization (\ENVI_LOC)
+        elseif self.ability.name == 'Envvious Joker' then -- Envvious Joker localization (\ENVI_LOC)
             loc_vars = {self.ability.extra.mult}
         elseif self.ability.name == 'Proud Joker' then -- Proud Joker localization (\PROU_LOC)
             loc_vars = {self.ability.extra.mult}
