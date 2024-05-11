@@ -618,7 +618,7 @@ function SMODS.INIT.Bunco()
     tarot_sky:register()
 
     function SMODS.Tarots.c_sky.set_badges(card, badges)
-        badges[1] = create_badge('Tarot?', HEX('a782d1'), HEX('FFFFFF'), 1.2)
+        badges[1] = create_badge('塔罗牌？', HEX('a782d1'), HEX('FFFFFF'), 1.2)
     end
 
     function SMODS.Tarots.c_sky.use(card, area, copier)
@@ -642,20 +642,20 @@ function SMODS.INIT.Bunco()
     end
 
     local text_tarot_abyss = { -- Abyss (Halberd) tarot
-        [1] = 'Converts up to',
-        [2] = '{C:attention}3{} selected cards',
-        [3] = 'to {C:斧枪}Halberds{}',
+        [1] = '将最多{C:attention}3{}张',
+        [2] = '选定卡牌',
+        [3] = '转换为{C:斧枪}斧枪'
     }
 
     local tarot_abyss = SMODS.Tarot:new('The Abyss', 'abyss', {max_highlighted = 3},
     { x = 1, y = 0 },
-    { name = 'The Abyss', text = text_tarot_abyss }, 3, 1, '', true, false, 'bunco_tarots')
+    { name = '深渊', text = text_tarot_abyss }, 3, 1, '', true, false, 'bunco_tarots')
 
     tarot_abyss:register()
 
     function SMODS.Tarots.c_abyss.set_badges(card, badges)
         if badges ~= nil then
-            badges[1] = create_badge('Tarot?', HEX('a782d1'), HEX('FFFFFF'), 1.2)
+            badges[1] = create_badge('塔罗牌？', HEX('a782d1'), HEX('FFFFFF'), 1.2)
         end
     end
 
