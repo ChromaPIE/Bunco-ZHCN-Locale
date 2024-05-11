@@ -296,11 +296,11 @@ function SMODS.INIT.Bunco()
 
     function forget(suit, initial, deck, forced) -- G.GAME.Suit returns nil if the suit wasn't encountered, true if it is currently in the deck and false if it was encountered but not in the deck
 
-        if suit == 'Fleurons' then
+        if suit == '印花' then
 
             if forced then
 
-                SMODS.Card:delete_suit('Fleurons')
+                SMODS.Card:delete_suit('印花')
 
                 G.GAME.Fleurons = false
 
@@ -314,19 +314,19 @@ function SMODS.INIT.Bunco()
                     local fleurons = false
 
                     for k, v in pairs(G.playing_cards) do
-                        if v:is_suit('Fleurons') then fleurons = true end
+                        if v:is_suit('印花') then fleurons = true end
                     end
 
                     if fleurons == false then
 
-                        SMODS.Card:delete_suit('Fleurons')
+                        SMODS.Card:delete_suit('印花')
 
                         G.GAME.Fleurons = false
 
                     end
                 else
 
-                    SMODS.Card:delete_suit('Fleurons')
+                    SMODS.Card:delete_suit('印花')
 
                     G.GAME.Fleurons = false
 
@@ -336,16 +336,16 @@ function SMODS.INIT.Bunco()
             end
 
             if initial ~= nil and initial == true then
-                SMODS.Card:delete_suit('Fleurons')
+                SMODS.Card:delete_suit('印花')
 
                 sendDebugMessage('Forgot '..suit..'! (Initial:'..tostring(initial or 'false')..')')
             end
 
-        elseif suit == 'Halberds' then
+        elseif suit == '斧枪' then
 
             if forced then
 
-                SMODS.Card:delete_suit('Halberds')
+                SMODS.Card:delete_suit('斧枪')
 
                 G.GAME.Halberds = false
 
@@ -359,19 +359,19 @@ function SMODS.INIT.Bunco()
                     local halberds = false
 
                     for k, v in pairs(G.playing_cards) do
-                        if v:is_suit('Halberds') then halberds = true end
+                        if v:is_suit('斧枪') then halberds = true end
                     end
 
                     if halberds == false then
 
-                        SMODS.Card:delete_suit('Halberds')
+                        SMODS.Card:delete_suit('斧枪')
 
                         G.GAME.Halberds = false
 
                     end
                 else
 
-                    SMODS.Card:delete_suit('Halberds')
+                    SMODS.Card:delete_suit('斧枪')
 
                     G.GAME.Halberds = false
 
@@ -381,7 +381,7 @@ function SMODS.INIT.Bunco()
             end
 
             if initial ~= nil and initial == true then
-                SMODS.Card:delete_suit('Halberds')
+                SMODS.Card:delete_suit('斧枪')
 
                 sendDebugMessage('Forgot '..suit..'! (Initial:'..tostring(initial or 'false')..')')
             end
@@ -391,9 +391,9 @@ function SMODS.INIT.Bunco()
 
     function acknowledge(suit, initial)
 
-        if suit == 'Fleurons' then
+        if suit == '印花' then
 
-            SMODS.Card:new_suit('Fleurons', 'exotic_cards', 'exotic_cards_high_contrast', { y = 0 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
+            SMODS.Card:new_suit('印花', 'exotic_cards', 'exotic_cards_high_contrast', { y = 0 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
                 { x = 0, y = 0 }, 'd6901a', 'dbb529')
 
             if G.GAME ~= nil and (G.GAME.Fleurons == false or G.GAME.Fleurons == nil) and initial == nil then
@@ -403,7 +403,7 @@ function SMODS.INIT.Bunco()
                 G.GAME.Fleurons = true
 
                 if G.GAME.first_exotic_suit == nil then
-                    G.GAME.first_exotic_suit = 'Fleurons'
+                    G.GAME.first_exotic_suit = '印花'
                 end
 
                 sendDebugMessage('Acknowledged '..suit..'! (Initial:'..tostring(initial or 'false')..')')
@@ -416,9 +416,9 @@ function SMODS.INIT.Bunco()
 
             end
 
-        elseif suit == 'Halberds' then
+        elseif suit == '斧枪' then
 
-            SMODS.Card:new_suit('Halberds', 'exotic_cards', 'exotic_cards_high_contrast', { y = 1 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
+            SMODS.Card:new_suit('斧枪', 'exotic_cards', 'exotic_cards_high_contrast', { y = 1 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
                 { x = 1, y = 0 }, '6e3c63', '993283')
 
             if G.GAME ~= nil and (G.GAME.Halberds == false or G.GAME.Halberds == nil) and initial == nil then
@@ -428,7 +428,7 @@ function SMODS.INIT.Bunco()
                 G.GAME.Halberds = true
 
                 if G.GAME.first_exotic_suit == nil then
-                    G.GAME.first_exotic_suit = 'Halberds'
+                    G.GAME.first_exotic_suit = '斧枪'
                 end
 
                 sendDebugMessage('Acknowledged '..suit..'! (Initial:'..tostring(initial or 'false')..')')
@@ -443,10 +443,10 @@ function SMODS.INIT.Bunco()
         end
     end
 
-    acknowledge('Fleurons', true)
-    acknowledge('Halberds', true)
-    forget('Fleurons', true)
-    forget('Halberds', true)
+    acknowledge('印花', true)
+    acknowledge('斧枪', true)
+    forget('印花', true)
+    forget('斧枪', true)
 
     local original_start_run = Game.start_run
 
@@ -469,42 +469,42 @@ function SMODS.INIT.Bunco()
         sendDebugMessage('Which suit was registered first? - '..tostring(saved_game and saved_game.GAME.first_exotic_suit))
 
         if saved_game ~= nil then
-            if saved_game.GAME.first_exotic_suit == 'Fleurons' then
+            if saved_game.GAME.first_exotic_suit == '印花' then
                 if saved_game.GAME.Fleurons ~= nil then
                     sendDebugMessage('Registered fleurons, because the current run already had them!')
-                    acknowledge('Fleurons')
+                    acknowledge('印花')
                 else
                     sendDebugMessage('Removed fleurons; undiscovered in the current run!')
-                    forget('Fleurons')
+                    forget('印花')
                 end
                 if saved_game.GAME.Halberds ~= nil then
                     sendDebugMessage('Registered halberds, because the current run already had them!')
-                    acknowledge('Halberds')
+                    acknowledge('斧枪')
                 else
                     sendDebugMessage('Removed halberds; undiscovered in the current run!')
-                    forget('Halberds')
+                    forget('斧枪')
                 end
-            elseif saved_game.GAME.first_exotic_suit == 'Halberds' then
+            elseif saved_game.GAME.first_exotic_suit == '斧枪' then
                 if saved_game.GAME.Halberds ~= nil then
                     sendDebugMessage('Registered halberds, because the current run already had them!')
-                    acknowledge('Halberds')
+                    acknowledge('斧枪')
                 else
                     sendDebugMessage('Removed halberds; undiscovered in the current run!')
-                    forget('Halberds')
+                    forget('斧枪')
                 end
                 if saved_game.GAME.Fleurons ~= nil then
                     sendDebugMessage('Registered fleurons, because the current run already had them!')
-                    acknowledge('Fleurons')
+                    acknowledge('印花')
                 else
                     sendDebugMessage('Removed fleurons; undiscovered in the current run!')
-                    forget('Fleurons')
+                    forget('印花')
                 end
             end
         else
 
             sendDebugMessage('Removed exotic suits; new run!')
-            forget('Fleurons')
-            forget('Halberds')
+            forget('印花')
+            forget('斧枪')
 
         end
 
@@ -514,13 +514,13 @@ function SMODS.INIT.Bunco()
             if saved_game.GAME.Fleurons == false then
 
                 sendDebugMessage('Removing fleurons that were discovered but are not in the deck')
-                forget('Fleurons', nil, nil, true)
+                forget('印花', nil, nil, true)
 
             end
             if saved_game.GAME.Halberds == false then
 
                 sendDebugMessage('Removing halberds that were discovered but are not in the deck')
-                forget('Halberds', nil, nil, true)
+                forget('斧枪', nil, nil, true)
 
             end
         end
@@ -539,13 +539,13 @@ function SMODS.INIT.Bunco()
         if text == ('Spectrum' or 'Straight Spectrum' or 'Spectrum House' or 'Spectrum Five') and G.GAME.hands[text].played > 0 then
 
             if G.GAME.Fleurons == nil then
-                acknowledge('Fleurons')
-                forget('Fleurons')
+                acknowledge('印花')
+                forget('印花')
             end
 
             if G.GAME.Halberds == nil then
-                acknowledge('Halberds')
-                forget('Halberds')
+                acknowledge('斧枪')
+                forget('斧枪')
             end
         end
     end
@@ -561,22 +561,22 @@ function SMODS.INIT.Bunco()
             local halberds = false
 
             for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Fleurons') then fleurons = true end
+                if v:is_suit('印花') then fleurons = true end
             end
             for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Halberds') then halberds = true end
+                if v:is_suit('斧枪') then halberds = true end
             end
 
             if fleurons == false and G.GAME.Fleurons == true then
 
                 sendDebugMessage('No fleurons in the deck, removing them completely!')
-                forget('Fleurons', nil, true)
+                forget('印花', nil, true)
 
             end
             if halberds == false and G.GAME.Halberds == true then
 
                 sendDebugMessage('No halberds in the deck, removing them completely!')
-                forget('Halberds', nil, true)
+                forget('斧枪', nil, true)
 
             end
         end
@@ -608,7 +608,7 @@ function SMODS.INIT.Bunco()
     local text_tarot_sky = { -- Sky (Fleuron) tarot
         [1] = '将最多{C:attention}3{}张',
         [2] = '选定卡牌',
-        [3] = '转换为{C:fleurons}印花'
+        [3] = '转换为{C:印花}印花'
     }
 
     local tarot_sky = SMODS.Tarot:new('The Sky', 'sky', {max_highlighted = 3},
@@ -623,7 +623,7 @@ function SMODS.INIT.Bunco()
 
     function SMODS.Tarots.c_sky.use(card, area, copier)
 
-        acknowledge('Fleurons')
+        acknowledge('印花')
 
         for i=1, #G.hand.highlighted do
             local percent = 1.15 - (i-0.999)/(#G.hand.highlighted-0.998)*0.3
@@ -631,7 +631,7 @@ function SMODS.INIT.Bunco()
         end
         delay(0.2)
         for i=1, #G.hand.highlighted do
-            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[i]:change_suit('Fleurons');return true end }))
+            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[i]:change_suit('印花');return true end }))
         end
         for i=1, #G.hand.highlighted do
             local percent = 0.85 + (i-0.999)/(#G.hand.highlighted-0.998)*0.3
@@ -644,7 +644,7 @@ function SMODS.INIT.Bunco()
     local text_tarot_abyss = { -- Abyss (Halberd) tarot
         [1] = 'Converts up to',
         [2] = '{C:attention}3{} selected cards',
-        [3] = 'to {C:halberds}Halberds{}',
+        [3] = 'to {C:斧枪}Halberds{}',
     }
 
     local tarot_abyss = SMODS.Tarot:new('The Abyss', 'abyss', {max_highlighted = 3},
@@ -661,7 +661,7 @@ function SMODS.INIT.Bunco()
 
     function SMODS.Tarots.c_abyss.use(card, area, copier)
 
-        acknowledge('Halberds')
+        acknowledge('斧枪')
 
         for i=1, #G.hand.highlighted do
             local percent = 1.15 - (i-0.999)/(#G.hand.highlighted-0.998)*0.3
@@ -669,7 +669,7 @@ function SMODS.INIT.Bunco()
         end
         delay(0.2)
         for i=1, #G.hand.highlighted do
-            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[i]:change_suit('Halberds');return true end }))
+            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[i]:change_suit('斧枪');return true end }))
         end
         for i=1, #G.hand.highlighted do
             local percent = 0.85 + (i-0.999)/(#G.hand.highlighted-0.998)*0.3
@@ -1324,10 +1324,10 @@ function SMODS.INIT.Bunco()
         if G.jokers ~= nil then
             for _, v in ipairs(G.jokers.cards) do
                 if v.ability.name == 'Myopia' and not v.debuff then
-                    if self.base.suit == 'Spades' and (self.base.suit == 'Spades') == (suit == 'Spades' or suit == 'Halberds') then
+                    if self.base.suit == 'Spades' and (self.base.suit == 'Spades') == (suit == 'Spades' or suit == '斧枪') then
                         returnable = true
                     end
-                    if self.base.suit == 'Clubs' and (self.base.suit == 'Clubs') == (suit == 'Clubs' or suit == 'Halberds') then
+                    if self.base.suit == 'Clubs' and (self.base.suit == 'Clubs') == (suit == 'Clubs' or suit == '斧枪') then
                         returnable = true
                     end
                 end
@@ -1339,10 +1339,10 @@ function SMODS.INIT.Bunco()
         if G.jokers ~= nil then
             for _, v in ipairs(G.jokers.cards) do
                 if v.ability.name == 'Astigmatism' and not v.debuff then
-                    if self.base.suit == 'Hearts' and (self.base.suit == 'Hearts') == (suit == 'Hearts' or suit == 'Fleurons') then
+                    if self.base.suit == 'Hearts' and (self.base.suit == 'Hearts') == (suit == 'Hearts' or suit == '印花') then
                         returnable = true
                     end
-                    if self.base.suit == 'Diamonds' and (self.base.suit == 'Diamonds') == (suit == 'Diamonds' or suit == 'Fleurons') then
+                    if self.base.suit == 'Diamonds' and (self.base.suit == 'Diamonds') == (suit == 'Diamonds' or suit == '印花') then
                         returnable = true
                     end
                 end
@@ -1352,13 +1352,13 @@ function SMODS.INIT.Bunco()
         if G.jokers ~= nil then
             for _, v in ipairs(G.jokers.cards) do
                 if v.ability.name == 'Smeared Joker' and not v.debuff then
-                    if self.base.suit == 'Fleurons' and (suit ~= 'Fleurons') then
+                    if self.base.suit == '印花' and (suit ~= '印花') then
                         returnable = false
                     end
-                    if self.base.suit == 'Halberds' and (suit ~= 'Halberds') then
+                    if self.base.suit == '斧枪' and (suit ~= '斧枪') then
                         returnable = false
                     end
-                    if (self.base.suit ~= 'Fleurons' and self.base.suit ~= 'Halberds') and (suit == 'Fleurons' or suit == 'Halberds') then
+                    if (self.base.suit ~= '印花' and self.base.suit ~= '斧枪') and (suit == '印花' or suit == '斧枪') then
                         returnable = false
                     end
                 end
@@ -1571,7 +1571,7 @@ function SMODS.INIT.Bunco()
         if context.individual and context.cardarea == G.play then
             if context.other_card:is_suit('Hearts') or
             context.other_card:is_suit('Diamonds') or
-            context.other_card:is_suit('Fleurons') then
+            context.other_card:is_suit('印花') then
                 if self.ability.extra.side == 'A' then
                     return {
                         chips = self.ability.extra.chips,
@@ -1582,7 +1582,7 @@ function SMODS.INIT.Bunco()
 
             if context.other_card:is_suit('Spades') or
             context.other_card:is_suit('Clubs') or
-            context.other_card:is_suit('Halberds') then
+            context.other_card:is_suit('斧枪') then
                 if self.ability.extra.side == 'B' then
                     return {
                         mult = self.ability.extra.mult,
@@ -1683,7 +1683,7 @@ function SMODS.INIT.Bunco()
     local loc_crop = {
         ['name'] = '麦田怪圈',
         ['text'] = {
-            [1] = '{C:fleurons}印花{}牌给予{C:mult}+4{}倍率，',
+            [1] = '{C:印花}印花{}牌给予{C:mult}+4{}倍率，',
             [2] = '{C:clubs}梅花{}牌给予{C:mult}+3{}倍率，',
             [3] = '8给予{C:mult}+2{}倍率，',
             [4] = 'Q、10、9、6给予{C:mult}+1{}倍率'
@@ -1708,7 +1708,7 @@ function SMODS.INIT.Bunco()
     SMODS.Jokers.j_crop.calculate = function(self, context)
 
         if context.individual and context.cardarea == G.play and context.other_card.ability.effect ~= 'Stone Card' then
-            if context.other_card.base.suit == ('Fleurons') then
+            if context.other_card.base.suit == ('印花') then
                 if context.other_card:get_id() == 8 then
                     return {
                         mult = 6,
@@ -2484,7 +2484,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '妒忌小丑',
         ['text'] = {
             [1] = '打出的',
-            [2] = '{C:fleurons}印花{}花色牌',
+            [2] = '{C:印花}印花{}花色牌',
             [3] = '在计分时给予{C:mult}+#1#{}倍率'
         }
     }
@@ -2506,7 +2506,7 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_envvious.calculate = function(self, context)
 
-        if context.individual and context.cardarea == G.play and context.other_card:is_suit('Fleurons') then
+        if context.individual and context.cardarea == G.play and context.other_card:is_suit('印花') then
             return {
                 message = localize {
                     type = 'variable',
@@ -2526,7 +2526,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '骄傲小丑',
         ['text'] = {
             [1] = '打出的',
-            [2] = '{C:halberds}斧枪{}花色牌',
+            [2] = '{C:斧枪}斧枪{}花色牌',
             [3] = '在计分时给予{C:mult}+#1#{}倍率'
         }
     }
@@ -2548,7 +2548,7 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_proud.calculate = function(self, context)
 
-        if context.individual and context.cardarea == G.play and context.other_card:is_suit('Halberds') then
+        if context.individual and context.cardarea == G.play and context.other_card:is_suit('斧枪') then
             return {
                 message = localize {
                     type = 'variable',
@@ -2836,7 +2836,7 @@ function SMODS.INIT.Bunco()
         ['name'] = 'Wishalloy',
         ['text'] = {
             [1] = '{C:green}#1# in #2#{} chance for',
-            [2] = 'played {C:fleurons}Fleurons{}',
+            [2] = 'played {C:印花}Fleurons{}',
             [3] = 'to earn money equal',
             [4] = "to card's scored chips"
         }
@@ -2859,7 +2859,7 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_wishalloy.calculate = function(self, context)
         if context.individual and context.cardarea == G.play then
-            if context.other_card:is_suit('Fleurons') then
+            if context.other_card:is_suit('印花') then
                 if pseudorandom('wishalloy'..G.SEED) < G.GAME.probabilities.normal / self.ability.extra.odds then
 
                     local value = context.other_card:get_chip_bonus()
@@ -2876,7 +2876,7 @@ function SMODS.INIT.Bunco()
         ['name'] = 'Unobtanium',
         ['text'] = {
             [1] = 'Played cards with',
-            [2] = '{C:halberds}Halberd{} suit',
+            [2] = '{C:斧枪}Halberd{} suit',
             [3] = 'give {C:chips}+100{} Chips and {C:red}+12{} Mult',
             [4] = "when scored"
         }
@@ -2898,7 +2898,7 @@ function SMODS.INIT.Bunco()
     joker_unobtanium:register()
 
     SMODS.Jokers.j_unobtanium.calculate = function(self, context)
-        if context.individual and context.cardarea == G.play and context.other_card:is_suit('Halberds') then
+        if context.individual and context.cardarea == G.play and context.other_card:is_suit('斧枪') then
 
             chips = hand_chips + self.ability.extra.chips
             update_hand_text({delay = 0, sound = 'chips1'}, {chips = chips, mult = mult})
@@ -2925,7 +2925,7 @@ function SMODS.INIT.Bunco()
         ['text'] = {
             [1] = 'Scored cards in the first',
             [2] = 'hand of round are converted',
-            [3] = 'to {C:fleurons}Fleurons'
+            [3] = 'to {C:印花}Fleurons'
         }
     }
 
@@ -2946,9 +2946,9 @@ function SMODS.INIT.Bunco()
 
     SMODS.Jokers.j_fondue.calculate = function(self, context)
         if G.GAME.current_round.hands_played == 0 and context.individual and context.cardarea == G.play and context.other_card and not context.blueprint then
-            acknowledge('Fleurons')
+            acknowledge('印花')
             G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() context.other_card:flip();play_sound('card1', 1);context.other_card:juice_up(0.3, 0.3);return true end }))
-            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()  context.other_card:change_suit('Fleurons');return true end }))
+            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()  context.other_card:change_suit('印花');return true end }))
             G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() context.other_card:flip();play_sound('tarot2', 1, 0.6);context.other_card:juice_up(0.3, 0.3);return true end }))
         end
     end
@@ -2960,7 +2960,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '近视',
         ['text'] = {
             [1] = '{C:spades}黑桃{}和{C:clubs}梅花{}牌',
-            [2] = '均视为{C:halberds}斧枪{}牌'
+            [2] = '均视为{C:斧枪}斧枪{}牌'
         }
     }
 
@@ -2992,7 +2992,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '散光',
         ['text'] = {
             [1] = '{C:hearts}红桃{}和{C:diamonds}方片{}牌',
-            [2] = '均视作{C:fleurons}印花{}牌'
+            [2] = '均视作{C:印花}印花{}牌'
         }
     }
 
@@ -3078,7 +3078,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '里戈莱托',
         ['text'] = {
             [1] = '如果打出的牌中',
-            [2] = '包含{C:halberds}斧枪{}或{C:fleurons}印花{}花色',
+            [2] = '包含{C:斧枪}斧枪{}或{C:印花}印花{}花色',
             [3] = '则每张计分的牌',
             [4] = '永久获得{C:red}+4{}倍率'
         }
@@ -3108,7 +3108,7 @@ function SMODS.INIT.Bunco()
             local condition = false
 
             for i = 1, #context.scoring_hand do
-                if context.scoring_hand[i]:is_suit('Halberds') or context.scoring_hand[i]:is_suit('Fleurons') then
+                if context.scoring_hand[i]:is_suit('斧枪') or context.scoring_hand[i]:is_suit('印花') then
                     condition = true
                 end
             end
