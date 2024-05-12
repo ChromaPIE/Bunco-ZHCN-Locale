@@ -1837,12 +1837,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_dread', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_dread = {
-        ['name'] = 'Dread',
+        ['name'] = '恐惧',
         ['text'] = {
-            [1] = 'After scoring your {C:attention}final hand{} of round,',
-            [2] = 'upgrade level of scored {C:attention}poker hand{}',
-            [3] = 'by {C:attention}2 levels{} and destroy cards from that hand,',
-            [4] = 'on Joker loss remove all gained levels'
+            [1] = '回合的{C:attention}最后一手牌{}完成计分时',
+            [2] = '将其对应{C:attention}牌型{}提升{C:attention}两级{}并摧毁这手卡牌',
+            [3] = '所提升的牌型等级会在失去此牌时一并扣除'
         }
     }
 
@@ -2248,10 +2247,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_jokermanjesterboy', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_jokermanjesterboy = {
-        ['name'] = 'Joker Man & Jester Boy Trading Card No. 54',
+        ['name'] = '小丑鱼战士与小丑男孩 集换卡 No. 54',
          ['text'] = {
-            [1] = '{C:attention}Standard Packs{} will contain',
-            [2] = 'only {C:attention}Enhanced Cards{}'
+            [1] = '{C:attention}标准包{}将只包含',
+            [2] = '{C:attention}增强卡牌'
         }
     }
 
@@ -2378,11 +2377,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_righthook', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_righthook = {
-        ['name'] = 'Righthook Joker',
+        ['name'] = '右勾拳小丑',
         ['text'] = {
-            [1] = 'Retrigger rightmost played card',
-            [2] = 'the same amount of times as',
-            [3] = 'your current amount of hands'
+            [1] = '使打出的牌中最右侧的牌',
+            [2] = '重新触发{C:attention}n{}次',
+            [3] = '{s:0.8,C:attention}n{s:0.8}为当前剩余出牌次数'
         }
     }
 
@@ -2419,11 +2418,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_fiendish', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_fiendish = {
-        ['name'] = 'Fiendish Joker',
+        ['name'] = '憎恶小丑',
         ['text'] = {
-            [1] = 'Doubles all sources of money,',
-            [2] = '{C:green}#1# in #2#{} chance to pay out',
-            [3] = 'with {C:money}$1{} instead'
+            [1] = '使所有资金来源翻倍',
+            [2] = '有{C:green}#1#/#2#{}的几率',
+            [3] = '在付款时仅扣除{C:money}$1'
         }
     }
 
@@ -3054,12 +3053,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_magicwand', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_magicwand = {
-        ['name'] = 'Magic Wand',
+        ['name'] = '魔法手杖',
         ['text'] = {
-            [1] = 'Gains {X:mult,C:white}X0.3{} Mult for each played',
-            [2] = 'hand containing a {C:attention}Spectrum{}, resets',
-            [3] = 'when a non-Spectrum hand is played',
-            [4] = '{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)'
+            [1] = '打出的牌包含{C:attention}五色{}时',
+            [2] = '获得{X:mult,C:white} X0.3 {}倍率',
+            [3] = '否则重置倍率',
+            [4] = '{C:inactive}（当前为{X:mult,C:white} X#1# {C:inactive}倍率）'
         }
     }
 
