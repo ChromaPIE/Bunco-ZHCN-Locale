@@ -2037,8 +2037,7 @@ function SMODS.INIT.Bunco()
                 update_hand_text({delay = 0, sound = '', modded = true}, {chips = chips, mult = mult})
                 if not context.blueprint then
 
-                    forced_message(G.localization.misc['poker_hands'][self.ability.extra.last_hand]..' !', self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
-                    forced_message(G.localization.misc['poker_hands'][G.GAME.last_hand_played]..'...', self, G.C.HAND_LEVELS[G.GAME.hands[G.GAME.last_hand_played].level], true)
+                    forced_message(G.localization.misc['poker_hands'][self.ability.extra.last_hand]..'!', self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
 
                 end
             end
