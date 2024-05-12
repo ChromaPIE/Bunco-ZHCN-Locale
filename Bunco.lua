@@ -1553,13 +1553,13 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_cassette', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_cassette = {
-        ['name'] = 'Cassette',
+        ['name'] = '磁带',
         ['text'] = {
-            [1] = 'On discard, flip Joker to the other side',
-            [2] = '{C:attention}A side:{} cards with light suit',
-            [3] = 'give {C:chips}+#1#{} Chips when scored',
-            [4] = '{C:attention}B side:{} cards with dark suit',
-            [5] = 'give {C:mult}+#2#{} Mult when scored',
+            [1] = '弃牌时，翻转此牌至另一面',
+            [2] = '{C:attention}A面：{C:hearts}红心{}、{C:diamonds}方片{}和{C:印花}印花{}牌',
+            [3] = '在计分时给予{C:chips}+#1#{}筹码',
+            [4] = '{C:attention}B面：{C:spades}黑桃{}、{C:clubs}梅花{}和{C:斧枪}斧枪{}牌',
+            [5] = '在计分时给予{C:mult}+#2#{}倍率'
         }
     }
 
@@ -1995,7 +1995,7 @@ function SMODS.INIT.Bunco()
                 G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()  context.scoring_hand[1]:change_suit(context.scoring_hand[2].config.card.suit);return true end }))
                 G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() context.scoring_hand[1]:flip();play_sound('tarot2', 1, 0.6);context.scoring_hand[1]:juice_up(0.3, 0.3);return true end }))
 
-                forced_message('Copied!', self, G.C.RED, true)
+                forced_message('印刷！', self, G.C.RED, true)
 
             end
         end
@@ -2008,15 +2008,15 @@ function SMODS.INIT.Bunco()
         ['name'] = '印刷残影',
         ['text'] = {
             [1] = '获得上一次打出牌型',
-            [2] = '的基底筹码和倍率',
-            [3] = '{C:inactive}（上一次出牌为#1#）'
+            [2] = '的基础筹码和倍率',
+            [3] = '{C:inactive}（上一次出牌为{C:attention}#1#{}）'
         }
     }
 
     local joker_ghostprint = SMODS.Joker:new(
         'Ghost Print', -- Name
         'ghostprint', -- Slug
-        {extra = {last_hand = nil or 'Nothing'}}, -- Config
+        {extra = {last_hand = nil}}, -- Config
         {x = 3, y = 1}, -- Sprite position
         loc_ghostprint, -- Localization
         2, -- Rarity
@@ -2032,13 +2032,14 @@ function SMODS.INIT.Bunco()
 
         if SMODS.end_calculate_context(context) then
 
-            if self.ability.extra.last_hand ~= nil and self.ability.extra.last_hand ~= 'Nothing' then
+            if self.ability.extra.last_hand ~= nil then
                 mult = mult + G.GAME.hands[self.ability.extra.last_hand].mult
                 chips = hand_chips + G.GAME.hands[self.ability.extra.last_hand].chips
                 update_hand_text({delay = 0, sound = '', modded = true}, {chips = chips, mult = mult})
                 if not context.blueprint then
 
-                    forced_message(tostring(self.ability.extra.last_hand)..'!', self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
+                    forced_message(G.localization.misc['poker_hands'][self.ability.extra.last_hand]..'！', self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
+                    forced_message(G.localization.misc['poker_hands'][G.GAME.last_hand_played]..'……', self, G.C.HAND_LEVELS[G.GAME.hands[G.GAME.last_hand_played].level], true)
 
                 end
             end
@@ -2083,10 +2084,10 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_basement', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_basement = {
-        ['name'] = 'Basement Joker',
+        ['name'] = '地下室小丑',
         ['text'] = {
-            [1] = 'When {C:attention}Boss Blind{} is defeated',
-            [2] = 'create a {C:spectral}Spectral{} card'
+            [1] = '击败{C:attention}Boss盲注{}时',
+            [2] = '生成一张{C:spectral}幻灵牌'
         }
     }
 
@@ -2153,7 +2154,7 @@ function SMODS.INIT.Bunco()
         if context.after and context.poker_hands ~= nil and next(context.poker_hands['Pair']) and not context.blueprint then
             self.ability.extra.chips = self.ability.extra.chips + 6
 
-            forced_message('+'..tostring(self.ability.extra.chips)..' Chips', self, G.C.BLUE)
+            forced_message('+'..tostring(self.ability.extra.chips)..'筹码', self, G.C.BLUE)
 
             delay(0.5)
         end
@@ -3756,10 +3757,10 @@ function SMODS.INIT.Bunco()
         'The Mask', -- Name
         'mask', -- Slug
         {name = '面具',
-        text = {'#1#的基础', '筹码和倍率为#2#'}},
+        text = {'#1#的基础筹码', '和倍率等同于#2#'}},
         5, -- Reward
         2, -- Multiplier
-        {}, -- Vars
+        {localize('ph_most_played'), '(least played hand)'}, -- Vars
         {}, -- Debuff
         {x = 0, y = 0}, -- Sprite position
         {min = 2, max = 10}, -- Boss antes
@@ -3790,10 +3791,10 @@ function SMODS.INIT.Bunco()
         'The Bulwark', -- Name
         'bulwark', -- Slug
         {name = '堡垒',
-        text = {'打出#1#', '将导致所有手牌被丢弃'}},
+        text = {'打出#1#牌型时', '丢弃所有手牌'}},
         5, -- Reward
         2, -- Multiplier
-        {}, -- Vars
+        {localize('ph_most_played')}, -- Vars
         {}, -- Debuff
         {x = 0, y = 0}, -- Sprite position
         {min = 2, max = 10}, -- Boss antes
@@ -4179,7 +4180,8 @@ function Card.generate_UIBox_ability_table(self)
         elseif self.ability.name == 'Linocut Joker' then -- Linocut Joker localization (\LINO_LOC)
             -- Hot Dog!
         elseif self.ability.name == 'Ghost Print' then -- Ghost Print Joker localization (\GHOS_LOC)
-            loc_vars = {self.ability.extra.last_hand}
+            local ph_last_played = G.localization.misc['poker_hands'][G.GAME.last_hand_played] or "[暂无]"
+            loc_vars = {ph_last_played}
         elseif self.ability.name == 'Loan Shark' then -- Loan Shark Joker localization (\LOAN_LOC)
             -- Scammed!
         elseif self.ability.name == 'Basement Joker' then -- Basement Joker localization (\BASE_LOC)
