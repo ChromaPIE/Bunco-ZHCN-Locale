@@ -7,7 +7,7 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
----- Bunco 4.0
+---- Bunco 4.1
 --
 -- A mod that I'm trying so hard to make. Of course feel free to reference anything from here.
 --
@@ -2032,17 +2032,15 @@ function SMODS.INIT.Bunco()
         if SMODS.end_calculate_context(context) then
 
             if self.ability.extra.last_hand ~= nil then
-                mult = mult + G.GAME.hands[self.ability.extra.last_hand].mult
-                chips = hand_chips + G.GAME.hands[self.ability.extra.last_hand].chips
-                update_hand_text({delay = 0, sound = '', modded = true}, {chips = chips, mult = mult})
-                if not context.blueprint then
-
-                    forced_message(G.localization.misc['poker_hands'][self.ability.extra.last_hand]..'!', self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
-
-                end
+                mult = mod_mult(mult + G.GAME.hands[self.ability.extra.last_hand].mult)
+                hand_chips = mod_chips(hand_chips + G.GAME.hands[self.ability.extra.last_hand].chips)
+                update_hand_text({delay = 0, sound = '', modded = true}, {chips = hand_chips, mult = mult})
+                forced_message(G.localization.misc['poker_hands'][self.ability.extra.last_hand]..'!', context.blueprint_card or self, G.C.HAND_LEVELS[G.GAME.hands[self.ability.extra.last_hand].level], true)
             end
 
-            self.ability.extra.last_hand = G.GAME.last_hand_played
+            if not context.blueprint then
+                self.ability.extra.last_hand = G.GAME.last_hand_played
+            end
         end
     end
 
@@ -2930,8 +2928,8 @@ function SMODS.INIT.Bunco()
     SMODS.Jokers.j_unobtanium.calculate = function(self, context)
         if context.individual and context.cardarea == G.play and context.other_card:is_suit('斧枪') then
 
-            chips = hand_chips + self.ability.extra.chips
-            update_hand_text({delay = 0, sound = 'chips1'}, {chips = chips, mult = mult})
+            hand_chips = mod_chips(hand_chips + self.ability.extra.chips)
+            update_hand_text({delay = 0, sound = 'chips1'}, {chips = hand_chips, mult = mult})
 
             forced_message('+'..tostring(self.ability.extra.chips), context.other_card, G.C.CHIPS, true)
 
@@ -3435,7 +3433,7 @@ function SMODS.INIT.Bunco()
     local original_game_update_shop = Game.update_shop
 
     function Game:update_shop(dt)
-        if G.GAME.final_trident == true and not G.GAME.blind.disabled and not find_joker('Chicot') then
+        if G.GAME.final_trident == true and not G.GAME.blind.disabled and not next(find_joker('Chicot')) then
             G.STATE = G.STATES.BLIND_SELECT
             return false
         end
@@ -3541,6 +3539,12 @@ function SMODS.INIT.Bunco()
                     v:flip()
                 end
 
+                for k, v in ipairs(G.play.cards) do
+                    if v.facing == 'back' then
+                        v:flip()
+                    end
+                end
+
                 G.GAME.blind:wiggle()
                 G.GAME.blind.triggered = true
 
@@ -3602,24 +3606,20 @@ function SMODS.INIT.Bunco()
         return returnable
     end
 
-    local original_blind_debuff_hand = Blind.debuff_hand
+    local original_blind_modify_hand = Blind.modify_hand
 
-    function Blind:debuff_hand(cards, hand, handname, check)
+    function Blind:modify_hand(cards, poker_hands, text, mult, hand_chips)
 
         if self.debuff and not self.disabled then
             if self.name == 'The Mask' then
-                if handname == G.GAME.current_round.most_played_poker_hand then
-                    if not check then
-                        local mult = G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_mult
-                        local chips = G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_chips
-                        update_hand_text({sound = '', modded = true}, {chips = chips, mult = mult})
-                        self.triggered = true
-                    end
+                if G.GAME.last_hand_played == G.GAME.current_round.most_played_poker_hand then
+                    self.triggered = true
+                    return G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_mult, G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_chips, true
                 end
             end
         end
 
-        original_blind_debuff_hand(self, cards, hand, handname, check)
+        return original_blind_modify_hand(self, cards, poker_hands, text, mult, hand_chips)
     end
 
     local original_blind_press_play = Blind.press_play
