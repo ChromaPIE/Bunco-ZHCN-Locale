@@ -7,7 +7,7 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
----- Bunco 3.3
+---- Bunco 4.0
 --
 -- A mod that I'm trying so hard to make. Of course feel free to reference anything from here.
 --
@@ -3133,7 +3133,7 @@ function SMODS.INIT.Bunco()
         if context.individual and context.cardarea == G.play then
             if context.other_card.config.center == G.P_CENTERS.m_stone or context.other_card:get_id() == 0 then
 
-                self.ability.extra.proc_amount = self.ability.extra.proc_amount + 1
+                self.ability.extra.proc_amount = self.ability.extra.proc_amount + 0.1
 
                 for k, v in pairs(G.GAME.probabilities) do
                     G.GAME.probabilities[k] = v + 0.1
@@ -3148,12 +3148,20 @@ function SMODS.INIT.Bunco()
 
         if context.end_of_round and not context.other_card then
             for k, v in pairs(G.GAME.probabilities) do
-                G.GAME.probabilities[k] = v - (self.ability.extra.proc_amount * 0.1)
+                G.GAME.probabilities[k] = v - (self.ability.extra.proc_amount)
             end
 
             self.ability.extra.proc_amount = 0
 
             forced_message(localize('k_reset'), self, G.C.GREEN, true)
+        end
+
+        if context.selling_self then
+            for k, v in pairs(G.GAME.probabilities) do
+                G.GAME.probabilities[k] = v - (self.ability.extra.proc_amount)
+            end
+
+            self.ability.extra.proc_amount = 0
         end
     end
 
@@ -3446,7 +3454,7 @@ function SMODS.INIT.Bunco()
     function Card:highlight(is_higlighted)
         original_card_highlight(self, is_higlighted)
 
-        if G.GAME.blind and G.GAME.blind.name == 'The Gate' and not G.GAME.blind.disabled and is_higlighted then
+        if G.GAME.blind and G.GAME.blind.name == 'The Gate' and not G.GAME.blind.disabled and is_higlighted and self.area == G.hand then
             self.ability.forced_selection = true
         end
     end
@@ -3454,9 +3462,9 @@ function SMODS.INIT.Bunco()
     local original_cardarea_remove_from_highlighted = CardArea.remove_from_highlighted
 
     function CardArea:remove_from_highlighted(card, force)
-        if G.GAME.blind and G.GAME.blind.name == 'The Gate' and G.GAME.blind.disabled and self == G.hand and not force then
+        if G.GAME.blind and G.GAME.blind.name == 'The Gate' and G.GAME.blind.disabled and card.area == G.hand and not force then
             card.ability.forced_selection = false
-        elseif G.GAME.blind and G.GAME.blind.name == 'The Gate' and not G.GAME.blind.disabled and card.ability.forced_selection == true and not force then
+        elseif G.GAME.blind and G.GAME.blind.name == 'The Gate' and not G.GAME.blind.disabled and card.ability.forced_selection == true and not force and card.area == G.hand then
             G.GAME.blind:wiggle()
         end
         original_cardarea_remove_from_highlighted(self, card, force)
@@ -3492,6 +3500,7 @@ function SMODS.INIT.Bunco()
                 end
 
                 G.GAME.blind:wiggle()
+                G.GAME.blind.triggered = true
 
                 if G.GAME.swing == true then
                     G.GAME.swing = false
@@ -3507,7 +3516,7 @@ function SMODS.INIT.Bunco()
             elseif G.GAME.current_round.hands_left == 1 or G.GAME.current_round.hands_left == 0 then
                 ease_hands_played(-1)
 
-                G.E_MANAGER:add_event(Event({ trigger = 'after', delay = 1.8, func = function()
+                G.E_MANAGER:add_event(Event({ trigger = 'after', delay = 1.2, func = function()
                     G.STATE = G.STATES.GAME_OVER
                     if not G.GAME.won and not G.GAME.seeded and not G.GAME.challenge then 
                         G.PROFILES[G.SETTINGS.profile].high_scores.current_streak.amt = 0
@@ -3533,6 +3542,7 @@ function SMODS.INIT.Bunco()
                 end
 
                 G.GAME.blind:wiggle()
+                G.GAME.blind.triggered = true
 
                 if G.GAME.swing == true then
                     G.GAME.swing = false
@@ -3552,6 +3562,7 @@ function SMODS.INIT.Bunco()
                 end
 
                 G.GAME.blind:wiggle()
+                G.GAME.blind.triggered = true
 
             return true end }))
         end
@@ -3560,6 +3571,7 @@ function SMODS.INIT.Bunco()
             if G.GAME.current_round.discards_left >= 1 then
                 ease_discard(-1, true)
                 G.GAME.blind:wiggle()
+                G.GAME.blind.triggered = true
             end
         end
     end
@@ -3601,6 +3613,7 @@ function SMODS.INIT.Bunco()
                         local mult = G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_mult
                         local chips = G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_chips
                         update_hand_text({sound = '', modded = true}, {chips = chips, mult = mult})
+                        self.triggered = true
                     end
                 end
             end
