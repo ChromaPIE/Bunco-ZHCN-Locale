@@ -2865,12 +2865,12 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_wishalloy', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_wishalloy = {
-        ['name'] = 'Wishalloy',
+        ['name'] = '梦中宝金',
         ['text'] = {
-            [1] = '{C:green}#1# in #2#{} chance for',
-            [2] = 'played {C:印花}Fleurons{}',
-            [3] = 'to earn money equal',
-            [4] = "to card's scored chips"
+            [1] = '打出的{C:印花}印花{}花色牌',
+            [2] = '有{C:green}#1#/#2#{}的几率',
+            [3] = '给予与其计分筹码数',
+            [4] = "等值的资金"
         }
     }
 
@@ -2905,12 +2905,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_unobtanium', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_unobtanium = {
-        ['name'] = 'Unobtanium',
+        ['name'] = '域外奇矿',
         ['text'] = {
-            [1] = 'Played cards with',
-            [2] = '{C:斧枪}Halberd{} suit',
-            [3] = 'give {C:chips}+100{} Chips and {C:red}+12{} Mult',
-            [4] = "when scored"
+            [1] = '打出的{C:斧枪}斧枪{}花色牌',
+            [2] = '在计分时给予{C:chips}+100{}筹码',
+            [3] = '和{C:red}+12{}倍率'
         }
     }
 
@@ -2953,11 +2952,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_fondue', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_fondue = {
-        ['name'] = 'Fondue',
+        ['name'] = '滚烫奶酪锅',
         ['text'] = {
-            [1] = 'Scored cards in the first',
-            [2] = 'hand of round are converted',
-            [3] = 'to {C:印花}Fleurons'
+            [1] = '将每回合第一次出牌中',
+            [2] = '所有计分的卡牌',
+            [3] = '转换为{C:印花}印花'
         }
     }
 
@@ -3759,7 +3758,7 @@ function SMODS.INIT.Bunco()
         text = {'#1#的基础筹码', '和倍率等同于#2#'}},
         5, -- Reward
         2, -- Multiplier
-        {localize('ph_most_played'), '(least played hand)'}, -- Vars
+        {localize('ph_most_played'), '{最不常出的牌型}'}, -- Vars
         {}, -- Debuff
         {x = 0, y = 0}, -- Sprite position
         {min = 2, max = 10}, -- Boss antes
