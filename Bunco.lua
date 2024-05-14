@@ -2710,11 +2710,11 @@ function SMODS.INIT.Bunco()
     SMODS.Sprite:new('j_zealous', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     local loc_zealous = {
-        ['name'] = 'Zealous Joker',
+        ['name'] = '热情小丑',
         ['text'] = {
-            [1] = '{C:red}+30{} Mult if played',
-            [2] = 'hand contains',
-            [3] = 'a {C:attention}Spectrum'
+            [1] = '如果打出的牌中',
+            [2] = '包含{C:attention}五色',
+            [3] = '{C:red}+30{}倍率'
         }
     }
 
