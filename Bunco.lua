@@ -3167,9 +3167,9 @@ function SMODS.INIT.Bunco()
     -- SMODS.Sprite:new('j_bill', bunco_mod.path, 'Jokers.png', 71, 95, 'asset_atli'):register()
 
     -- local loc_bill = {
-    --     ['name'] = '削弱薛若',
+    --     ['name'] = '失效史笑',
     --     ['text'] = {
-    --         [1] = '打出的{C:attention}被削弱{}的牌',
+    --         [1] = '打出的{C:attention}失效{}牌',
     --         [2] = '在计分时给予{C:money}$1'
     --     }
     -- }
@@ -3812,7 +3812,7 @@ function SMODS.INIT.Bunco()
         'The Flame', -- Name
         'flame', -- Slug
         {name = '火焰',
-        text = {'所有增强卡牌', '都被削弱'}},
+        text = {'增强卡牌全部失效'}},
         5, -- Reward
         2, -- Multiplier
         {}, -- Vars
@@ -3846,7 +3846,7 @@ function SMODS.INIT.Bunco()
         'The Knoll', -- Name
         'knoll', -- Slug
         {name = '土墩',
-        text = {'若资金多于$10', '削弱抽到的第一手牌'}},
+        text = {'若资金多于$10', '使抽到的第一手牌全部失效'}},
         5, -- Reward
         2, -- Multiplier
         {}, -- Vars
@@ -3880,7 +3880,7 @@ function SMODS.INIT.Bunco()
         'Chartreuse Crown', -- Name
         'final_crown', -- Slug
         {name = '荨黄之冠',
-        text = {'所有原版四种花色的牌', '都被削弱'}},
+        text = {'原版四种花色的牌全部失效'}},
         8, -- Reward
         2, -- Multiplier
         {}, -- Vars
