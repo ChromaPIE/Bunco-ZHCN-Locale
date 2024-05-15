@@ -4379,6 +4379,10 @@ function Card.generate_UIBox_ability_table(self)
     end
 
     return generate_UIBox_ability_tableref(self)
+    
+    -- 单数ERROR修复（城堡等）
+    G.localization.misc['suits_singular']['斧枪'] = "斧枪"
+G.localization.misc['suits_singular']['印花'] = "印花"
 end
 
 ----------------------------------------------
