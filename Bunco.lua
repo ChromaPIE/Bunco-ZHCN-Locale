@@ -7,7 +7,7 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
----- Bunco 4.1
+---- Bunco 4.2
 --
 -- A mod that I'm trying so hard to make. Of course feel free to reference anything from here.
 --
@@ -204,6 +204,10 @@ function SMODS.INIT.Bunco()
         for _, v in pairs(suits) do
             if v > 0 then num_suits = num_suits + 1 end
         end
+
+        sendDebugMessage('Amount of wild cards: '..num_wild_cards or '')
+        sendDebugMessage('Amount of non-wild cards: '..num_non_wild_cards or '')
+        sendDebugMessage('Amount of suits in total: '..num_suits or '')
 
         if num_non_wild_cards == 1 then
             return { hand }
@@ -2700,12 +2704,21 @@ function SMODS.INIT.Bunco()
             for _, v in ipairs(self.ability.extra.new_card_list) do
                 v.ability.perma_bonus = v.ability.perma_bonus or 0
                 v.ability.perma_bonus = v.ability.perma_bonus + self.ability.extra.bonus
-
-                table.insert(self.ability.extra.old_card_list, v)
             end
+
+            self.ability.extra.old_card_list = self.ability.extra.new_card_list
+            -- not needed, but good style to fail fast
+            self.ability.extra.new_card_list = nil
 
             forced_message(localize('k_upgrade_ex'), self, G.C.CHIPS)
 
+        end
+
+        if context.selling_self and not context.blueprint then
+            for _, v in ipairs(self.ability.extra.old_card_list) do
+                v.ability.perma_bonus = v.ability.perma_bonus or 0
+                v.ability.perma_bonus = v.ability.perma_bonus - self.ability.extra.bonus
+            end
         end
     end
 
@@ -2716,7 +2729,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '热情小丑',
         ['text'] = {
             [1] = '如果打出的牌中',
-            [2] = '包含{C:attention}五色',
+            [2] = '包含{C:attention}缤彩',
             [3] = '{C:red}+30{}倍率'
         }
     }
@@ -2747,7 +2760,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '艳俗小丑',
         ['text'] = {
             [1] = '如果打出的牌中',
-            [2] = '包含{C:attention}五色',
+            [2] = '包含{C:attention}缤彩',
             [3] = '{C:chips}+120{}筹码'
         }
     }
@@ -2808,7 +2821,7 @@ function SMODS.INIT.Bunco()
     local loc_starfruit = {
         ['name'] = '五角杨桃',
         ['text'] = {
-            [1] = '如果打出的牌中包含{C:attention}五色',
+            [1] = '如果打出的牌中包含{C:attention}缤彩',
             [2] = '有{C:green}#1#/#2#{}的几率升级当前牌型',
             [3] = '回合结束时有{C:green}#1#/#3#{}的几率被摧毁'
         }
@@ -3053,7 +3066,7 @@ function SMODS.INIT.Bunco()
     local loc_magicwand = {
         ['name'] = '魔法手杖',
         ['text'] = {
-            [1] = '打出的牌包含{C:attention}五色{}时',
+            [1] = '打出的牌包含{C:attention}缤彩{}时',
             [2] = '获得{X:mult,C:white} X0.3 {}倍率',
             [3] = '否则重置倍率',
             [4] = '{C:inactive}（当前为{X:mult,C:white} X#1# {C:inactive}倍率）'
