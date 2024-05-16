@@ -396,6 +396,8 @@ function SMODS.INIT.Bunco()
             SMODS.Card:new_suit('印花', 'exotic_cards', 'exotic_cards_high_contrast', { y = 0 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
                 { x = 0, y = 0 }, 'd6901a', 'dbb529')
 
+            G.localization.misc['suits_singular']['印花'] = "印花"
+
             if G.GAME ~= nil and (G.GAME.Fleurons == false or G.GAME.Fleurons == nil) and initial == nil then
 
                 G.GAME.allow_exotic = true
@@ -420,6 +422,8 @@ function SMODS.INIT.Bunco()
 
             SMODS.Card:new_suit('斧枪', 'exotic_cards', 'exotic_cards_high_contrast', { y = 1 }, 'exotic_cards_ui', 'exotic_cards_ui_high_contrast',
                 { x = 1, y = 0 }, '6e3c63', '993283')
+
+            G.localization.misc['suits_singular']['斧枪'] = "斧枪"
 
             if G.GAME ~= nil and (G.GAME.Halberds == false or G.GAME.Halberds == nil) and initial == nil then
 
@@ -4380,9 +4384,6 @@ function Card.generate_UIBox_ability_table(self)
 
     return generate_UIBox_ability_tableref(self)
     
-    -- 单数ERROR修复（城堡等）
-    G.localization.misc['suits_singular']['斧枪'] = "斧枪"
-G.localization.misc['suits_singular']['印花'] = "印花"
 end
 
 ----------------------------------------------
