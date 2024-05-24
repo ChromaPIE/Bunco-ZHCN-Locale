@@ -1846,7 +1846,7 @@ function SMODS.INIT.Bunco()
     local loc_dread = {
         ['name'] = '恐惧',
         ['text'] = {
-            [1] = '回合的{C:attention}最后一手牌{}完成计分时',
+            [1] = '回合的{C:attention}最后一次出牌{}计分后',
             [2] = '将其对应{C:attention}牌型{}提升{C:attention}两级{}并摧毁这手卡牌',
             [3] = '所提升的牌型等级会在失去此牌时一并扣除'
         }
@@ -2662,10 +2662,9 @@ function SMODS.INIT.Bunco()
     local loc_fingerprints = {
         ['name'] = '指纹档案',
         ['text'] = {
-            [1] = '每回合{C:attention}最后一次出牌{}',
-            [2] = '中的每张牌在计分时',
-            [3] = '获得临时的{C:chips}+#1#{}筹码',
-            [4] = '加成仅持续一回合'
+            [1] = '每回合{C:attention}最后一手牌{}中的',
+            [2] = '每张牌获得临时的{C:chips}+#1#{}筹码',
+            [3] = '{s:0.8}加成仅在下一回合中生效'
         }
     }
 
@@ -2727,7 +2726,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '热情小丑',
         ['text'] = {
             [1] = '如果打出的牌中',
-            [2] = '包含{C:attention}五色',
+            [2] = '包含{C:attention}缤彩',
             [3] = '{C:red}+30{}倍率'
         }
     }
@@ -2758,7 +2757,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '艳俗小丑',
         ['text'] = {
             [1] = '如果打出的牌中',
-            [2] = '包含{C:attention}五色',
+            [2] = '包含{C:attention}缤彩',
             [3] = '{C:chips}+120{}筹码'
         }
     }
@@ -2819,7 +2818,7 @@ function SMODS.INIT.Bunco()
     local loc_starfruit = {
         ['name'] = '五角杨桃',
         ['text'] = {
-            [1] = '如果打出的牌中包含{C:attention}五色',
+            [1] = '如果打出的牌中包含{C:attention}缤彩',
             [2] = '有{C:green}#1#/#2#{}的几率升级当前牌型',
             [3] = '回合结束时有{C:green}#1#/#3#{}的几率被摧毁'
         }
@@ -3064,7 +3063,7 @@ function SMODS.INIT.Bunco()
     local loc_magicwand = {
         ['name'] = '魔法手杖',
         ['text'] = {
-            [1] = '打出的牌包含{C:attention}五色{}时',
+            [1] = '打出的牌包含{C:attention}缤彩{}时',
             [2] = '获得{X:mult,C:white} X0.3 {}倍率',
             [3] = '否则重置倍率',
             [4] = '{C:inactive}（当前为{X:mult,C:white} X#1# {C:inactive}倍率）'
