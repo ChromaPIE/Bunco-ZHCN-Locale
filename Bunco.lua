@@ -1846,7 +1846,7 @@ function SMODS.INIT.Bunco()
     local loc_dread = {
         ['name'] = '恐惧',
         ['text'] = {
-            [1] = '回合的{C:attention}最后一手牌{}完成计分时',
+            [1] = '回合的{C:attention}最后一次出牌{}计分后',
             [2] = '将其对应{C:attention}牌型{}提升{C:attention}两级{}并摧毁这手卡牌',
             [3] = '所提升的牌型等级会在失去此牌时一并扣除'
         }
@@ -2662,10 +2662,9 @@ function SMODS.INIT.Bunco()
     local loc_fingerprints = {
         ['name'] = '指纹档案',
         ['text'] = {
-            [1] = '每回合{C:attention}最后一次出牌{}',
-            [2] = '中的每张牌在计分时',
-            [3] = '获得临时的{C:chips}+#1#{}筹码',
-            [4] = '加成仅持续一回合'
+            [1] = '每回合{C:attention}最后一手牌{}中的',
+            [2] = '每张牌获得临时的{C:chips}+#1#{}筹码',
+            [3] = '{s:0.8}加成仅在下一回合中生效'
         }
     }
 
