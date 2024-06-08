@@ -3807,7 +3807,7 @@ function SMODS.INIT.Bunco()
         'The Mask', -- Name
         'mask', -- Slug
         {name = '面具',
-        text = {'#1#的基础筹码', '和倍率等同于#2#'}},
+        text = {'#1#的基础筹码和倍率', '等同于无升级的#2#'}},
         5, -- Reward
         2, -- Multiplier
         {localize('ph_most_played'), '{最不常出的牌型}'}, -- Vars
