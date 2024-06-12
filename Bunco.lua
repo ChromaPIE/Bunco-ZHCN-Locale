@@ -1563,7 +1563,7 @@ function SMODS.INIT.Bunco()
         ['name'] = '磁带',
         ['text'] = {
             [1] = '弃牌时，翻转此牌至另一面',
-            [2] = '{C:attention}A面：{C:hearts}红心{}、{C:diamonds}方片{}、和{C:印花}印花{}牌',
+            [2] = '{C:attention}A面：{C:hearts}红桃{}、{C:diamonds}方片{}、和{C:印花}印花{}牌',
             [3] = '在计分时给予{C:chips}+#1#{}筹码',
             [4] = '{C:attention}B面：{C:spades}黑桃{}、{C:clubs}梅花{}、和{C:斧枪}斧枪{}牌',
             [5] = '在计分时给予{C:mult}+#2#{}倍率'
