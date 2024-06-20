@@ -6,6 +6,7 @@ return {
 		},
 		["poker_hands"] = {
 			["h_bunc_Spectrum"] = "Spectrum",
+			["h_bunc_Deal"] = "Deal",
 			["h_bunc_Straight Spectrum_2"] = "Royal Spectrum",
 			["h_bunc_Spectrum Five"] = "Spectrum Five",
 			["h_bunc_Spectrum House"] = "Spectrum House",
@@ -17,13 +18,21 @@ return {
 		},
 		["dictionary"] = {
 			["bunco"] = {
-				["least_played_hand"] = "(least played hand)",
 				["most_played_rank"] = "(most played rank)",
+				["temporary_extra_chips"] = {
+					["text"] = {
+						"{C:chips}+#1#{} extra chips this round",
+					},
+				},
+				["loop"] = "Loop!",
+				["word_and"] = "and",
+				["chips"] = "Chips",
+				["exceeded_score"] = "Exceeded the limit!",
 				["copied"] = "Copied!",
 				["chance"] = "Chance",
-				["chips"] = "Chips",
+				["least_played_hand"] = "(least played hand)",
+				["blade"] = "(1.5X blind score)",
 				["nothing"] = "Nothing",
-				["loop"] = "Loop!",
 			},
 		},
 		["poker_hand_descriptions"] = {
@@ -41,6 +50,10 @@ return {
 			},
 			["h_bunc_Spectrum"] = {
 				"5 cards with different suits",
+			},
+			["h_bunc_Deal"] = {
+				"5 ranks picked",
+				"by Registration Plate",
 			},
 		},
 	},
@@ -74,25 +87,25 @@ return {
 					"cards are flipped",
 				},
 			},
+			["bl_bunc_sand"] = {
+				["name"] = "The Sand",
+				["text"] = {
+					"+1X Base score for",
+					"every tag held",
+				},
+			},
+			["bl_bunc_swing"] = {
+				["name"] = "The Swing",
+				["text"] = {
+					"After Play or Discard,",
+					"all cards are flipped",
+				},
+			},
 			["bl_bunc_miser"] = {
 				["name"] = "The Miser",
 				["text"] = {
 					"Shop is skipped after",
 					"defeating this blind",
-				},
-			},
-			["bl_bunc_final_dagger"] = {
-				["name"] = "Magenta Dagger",
-				["text"] = {
-					"Discarding cards plays them",
-					"and subtracts scored value",
-				},
-			},
-			["bl_bunc_paling"] = {
-				["name"] = "The Paling",
-				["text"] = {
-					"Playing or discarding costs",
-					"both play and discard",
 				},
 			},
 			["bl_bunc_final_shield"] = {
@@ -102,6 +115,20 @@ return {
 					"to this blind's required score",
 				},
 			},
+			["bl_bunc_paling"] = {
+				["name"] = "The Paling",
+				["text"] = {
+					"Playing or discarding costs",
+					"both play and discard",
+				},
+			},
+			["bl_bunc_final_tower"] = {
+				["name"] = "Indigo Tower",
+				["text"] = {
+					"Cards not played previously",
+					"this Ante are debuffed",
+				},
+			},
 			["bl_bunc_claw"] = {
 				["name"] = "The Claw",
 				["text"] = {
@@ -109,32 +136,25 @@ return {
 					"go back into the deck",
 				},
 			},
-			["bl_bunc_final_tower"] = {
-				["name"] = "Indigo Tower",
-				["text"] = {
-					"Cards unplayed previously",
-					"this Ante are debuffed",
-				},
-			},
 			["bl_bunc_final_trident"] = {
 				["name"] = "Vermilion Trident",
 				["text"] = {
 					"Shops are disabled",
-					"during this Ante",
+					"this Ante",
 				},
 			},
-			["bl_bunc_cadaver"] = {
-				["name"] = "The Cadaver",
+			["bl_bunc_final_dagger"] = {
+				["name"] = "Magenta Dagger",
 				["text"] = {
-					"Must not play",
-					"any face cards",
+					"Discarding cards plays them",
+					"and subtracts scored value",
 				},
 			},
 			["bl_bunc_blade"] = {
 				["name"] = "The Blade",
 				["text"] = {
-					" ",
-					" ",
+					"First time score exceeds #1#",
+					"makes last played hand score 0",
 				},
 			},
 			["bl_bunc_final_crown"] = {
@@ -147,8 +167,8 @@ return {
 			["bl_bunc_stone"] = {
 				["name"] = "The Stone",
 				["text"] = {
-					"Blind score scales",
-					"for every $10 held",
+					"+1X Base score for",
+					"every $10 held",
 				},
 			},
 			["bl_bunc_flame"] = {
@@ -165,18 +185,11 @@ return {
 					"all cards held in hand",
 				},
 			},
-			["bl_bunc_sand"] = {
-				["name"] = "The Sand",
+			["bl_bunc_cadaver"] = {
+				["name"] = "The Cadaver",
 				["text"] = {
-					"Blind score scales",
-					"for every tag held",
-				},
-			},
-			["bl_bunc_swing"] = {
-				["name"] = "The Swing",
-				["text"] = {
-					"After Play or Discard,",
-					"all cards are flipped",
+					"Must not play",
+					"face cards",
 				},
 			},
 			["bl_bunc_gate"] = {
@@ -263,19 +276,21 @@ return {
 					"{C:inactive}(Drag to rearrange)",
 				},
 			},
-			["j_bunc_registration_plate"] = {
-				["name"] = "Registration Plate",
+			["j_bunc_slothful"] = {
+				["name"] = "Slothful Joker",
 				["text"] = {
-					"{X:mult,C:white}X#1#{} Mult when played hand",
-					"is a combination of",
-					"#2#",
-					"{s:0.8}Combination changes every round",
+					"Played {C:attention}Wild Cards",
+					"give {C:mult}+#1#{} Mult",
+					"when scored",
 				},
 			},
 			["j_bunc_roygbiv"] = {
 				["name"] = "Roy G. Biv",
 				["text"] = {
-					"",
+					"{C:green}#1# in #2#{} chance to apply",
+					"{C:dark_edition}Polychrome{} edition",
+					"to a random scored card if",
+					"hand contains a {C:attention}Spectrum",
 				},
 			},
 			["j_bunc_knight"] = {
@@ -295,6 +310,14 @@ return {
 					"a {C:attention}Spectrum",
 				},
 			},
+			["j_bunc_fiendish"] = {
+				["name"] = "Fiendish Joker",
+				["text"] = {
+					"Doubles all sources of money,",
+					"{C:green}#1# in #2#{} chance to pay out",
+					"with {C:money}$1{} instead",
+				},
+			},
 			["j_bunc_astigmatism"] = {
 				["name"] = "Astigmatism",
 				["text"] = {
@@ -302,12 +325,12 @@ return {
 					"count as {C:fleurons}Fleurons",
 				},
 			},
-			["j_bunc_nil_bill"] = {
-				["name"] = "Nil Bill",
+			["j_bunc_fondue"] = {
+				["name"] = "Fondue",
 				["text"] = {
-					"Played cards with",
-					"{C:attention}debuff{} give",
-					"{C:money}$#1#{} when scored",
+					"Scored cards in the first",
+					"hand of round are converted",
+					"to {C:fleurons}Fleurons",
 				},
 			},
 			["j_bunc_jmjb"] = {
@@ -367,14 +390,6 @@ return {
 					"{C:inactive}(Last poker hand: #1#)",
 				},
 			},
-			["j_bunc_fiendish"] = {
-				["name"] = "Fiendish Joker",
-				["text"] = {
-					"Doubles all sources of money,",
-					"{C:green}#1# in #2#{} chance to pay out",
-					"with {C:money}$1{} instead",
-				},
-			},
 			["j_bunc_shepherd"] = {
 				["name"] = "Shepherd Joker",
 				["text"] = {
@@ -391,12 +406,13 @@ return {
 					"contains {C:halberds}Halberds{} or {C:fleurons}Fleurons",
 				},
 			},
-			["j_bunc_slothful"] = {
-				["name"] = "Slothful Joker",
+			["j_bunc_registration_plate"] = {
+				["name"] = "Registration Plate",
 				["text"] = {
-					"Played {C:attention}Wild Cards",
-					"give {C:mult}+#1#{} Mult",
-					"when scored",
+					"#2#",
+					"has the Chips and Mult of all",
+					"{C:attention}poker hands{} played this game",
+					"{s:0.8}Combination changes every round",
 				},
 			},
 			["j_bunc_fingerprints"] = {
@@ -554,6 +570,14 @@ return {
 					"works only on a greater Ante",
 				},
 			},
+			["j_bunc_doorhanger"] = {
+				["name"] = "Doorhanger",
+				["text"] = {
+					"Disables {C:blue}Common{} Jokers",
+					"from appearing",
+					"{s:0.8}different rarities appear instead",
+				},
+			},
 			["j_bunc_envious"] = {
 				["name"] = "Envious Joker",
 				["text"] = {
@@ -562,20 +586,12 @@ return {
 					"{C:mult}+#1#{} Mult when scored",
 				},
 			},
-			["j_bunc_fondue"] = {
-				["name"] = "Fondue",
+			["j_bunc_nil_bill"] = {
+				["name"] = "Nil Bill",
 				["text"] = {
-					"Scored cards in the first",
-					"hand of round are converted",
-					"to {C:fleurons}Fleurons",
-				},
-			},
-			["j_bunc_doorhanger"] = {
-				["name"] = "Doorhanger",
-				["text"] = {
-					"Disables {C:blue}Common{} Jokers",
-					"from appearing",
-					"{s:0.8}different rarities appear instead",
+					"Played cards with",
+					"{C:attention}debuff{} give",
+					"{C:money}$#1#{} when scored",
 				},
 			},
 			["j_bunc_starfruit"] = {
