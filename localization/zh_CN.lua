@@ -1,36 +1,36 @@
 return {
 	["misc"] = {
 		["suits_plural"] = {
-			["Fleurons"] = "Fleurons",
-			["Halberds"] = "Halberds",
+			["Fleurons"] = "印花",
+			["Halberds"] = "斧枪",
 		},
 		["poker_hands"] = {
-			["h_bunc_Spectrum"] = "Spectrum",
+			["h_bunc_Spectrum"] = "缤彩",
 			["h_bunc_Deal"] = "Deal",
-			["h_bunc_Straight Spectrum_2"] = "Royal Spectrum",
-			["h_bunc_Spectrum Five"] = "Spectrum Five",
-			["h_bunc_Spectrum House"] = "Spectrum House",
-			["h_bunc_Straight Spectrum"] = "Straight Spectrum",
+			["h_bunc_Straight Spectrum_2"] = "皇家缤彩顺",
+			["h_bunc_Spectrum Five"] = "缤彩五条",
+			["h_bunc_Spectrum House"] = "缤彩葫芦",
+			["h_bunc_Straight Spectrum"] = "缤彩顺",
 		},
 		["suits_singular"] = {
-			["Fleurons"] = "Fleuron",
-			["Halberds"] = "Halberd",
+			["Fleurons"] = "印花",
+			["Halberds"] = "斧枪",
 		},
 		["dictionary"] = {
 			["bunco"] = {
-				["most_played_rank"] = "(most played rank)",
+				["most_played_rank"] = "（最常出点数）",
 				["temporary_extra_chips"] = {
 					["text"] = {
-						"{C:chips}+#1#{} extra chips this round",
+						"本回合内{C:chips}+#1#{}额外筹码",
 					},
 				},
 				["loop"] = "Loop!",
-				["word_and"] = "and",
-				["chips"] = "Chips",
+				["word_and"] = "和",
+				["chips"] = "筹码",
 				["exceeded_score"] = "Exceeded the limit!",
 				["copied"] = "Copied!",
-				["chance"] = "Chance",
-				["least_played_hand"] = "(least played hand)",
+				["chance"] = "几率",
+				["least_played_hand"] = "（最不常出牌型）",
 				["blade"] = "(1.5X blind score)",
 				["nothing"] = "Nothing",
 			},
