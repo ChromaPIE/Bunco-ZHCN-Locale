@@ -385,7 +385,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Registration Plate',
             ['text'] = {
-                [1] = '#2#',
+                [1] = '#1#',
                 [2] = 'has the Chips and Mult of all',
                 [3] = '{C:attention}poker hands{} played this game',
                 [4] = '{s:0.8}Combination changes every round'
@@ -757,6 +757,52 @@ return {
 
     -- Tags
 
+    chips = {
+        ['en-us'] = {
+            ['name'] = 'Chips Tag',
+            ['text'] = {
+                [1] = 'Adds {C:chips}+50{} Chips',
+                [2] = 'to the next hand'
+            }
+        }
+    },
+    mult = {
+        ['en-us'] = {
+            ['name'] = 'Mult Tag',
+            ['text'] = {
+                [1] = 'Adds {C:mult}+10{} Mult',
+                [2] = 'to the next hand'
+            }
+        }
+    },
+    xmult = {
+        ['en-us'] = {
+            ['name'] = 'Megamult Tag',
+            ['text'] = {
+                [1] = 'Adds {X:mult,C:white}X1.5{} Mult',
+                [2] = 'to the next hand'
+            }
+        }
+    },
+    xchips = {
+        ['en-us'] = {
+            ['name'] = 'Ultrachips Tag',
+            ['text'] = {
+                [1] = 'Adds {X:chips,C:white}X1.2{} Chips',
+                [2] = 'to the next hand'
+            }
+        }
+    },
+    glitter_tag = {
+        ['en-us'] = {
+            ['name'] = 'Glitter Tag',
+            ['text'] = {
+                [1] = 'Next base edition shop',
+                [2] = 'Joker is free and',
+                [3] = 'becomes {C:dark_edition}Glitter'
+            }
+        }
+    },
     filigree = {
         ['en-us'] = {
             ['name'] = 'Filigree Tag',
@@ -765,5 +811,17 @@ return {
                 [2] = 'only {C:bunco_exotic}Exotic suits'
             }
         }
-    }
+    },
+
+    -- Editions
+
+    glitter_edition = {
+        ['en-us'] = {
+            ['name'] = 'Glitter',
+            ['label'] = 'Glitter',
+            ['text'] = {
+                [1] = '{X:chips,C:white}X#1#{} Chips'
+            }
+        }
+    },
 }

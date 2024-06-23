@@ -9,7 +9,7 @@
 -- Fix Crop Circles always showing Fleurons (done)
 -- Check how to add custom entries to the localization (for card messages like linocut's one) (done)
 -- Cassette proper coordinates (done)
--- Polychrome desc on roy g biv
+-- Polychrome desc on roy g biv (done)
 -- Debuff registration plate level with shader if possible
 -- Nan morgan or make zero shapiro count letter rank cards
 -- Unlocks
@@ -18,6 +18,7 @@
 -- Card sizes
 -- Magenta dagger wobble?
 -- Disable Bierdeckel upgrade message on win
+-- Global variable for glitter (done)
 
 local bunco = SMODS.current_mod
 local filesystem = NFS or love.filesystem
@@ -28,9 +29,9 @@ local config = filesystem.load(bunco.path..'config.lua')()
 -- Shaders
 
 if config.high_quality_shaders then
-    local background_shader = NFS.read(bunco.path..'resources/shaders/background.fs')
-    local splash_shader = NFS.read(bunco.path..'resources/shaders/splash.fs')
-    local flame_shader = NFS.read(bunco.path..'resources/shaders/flame.fs')
+    local background_shader = NFS.read(bunco.path..'assets/shaders/background.fs')
+    local splash_shader = NFS.read(bunco.path..'assets/shaders/splash.fs')
+    local flame_shader = NFS.read(bunco.path..'assets/shaders/flame.fs')
     G.SHADERS['background'] = love.graphics.newShader(background_shader)
     G.SHADERS['splash'] = love.graphics.newShader(splash_shader)
     G.SHADERS['flame'] = love.graphics.newShader(flame_shader)
@@ -142,6 +143,7 @@ function SMODS.current_mod.process_loc_text()
 
     SMODS.process_loc_text(G.localization.descriptions.Other, 'temporary_extra_chips', loc.dictionary.temporary_extra_chips)
     global_bunco_loc.exceeded_score = loc.dictionary.exceeded_score
+    global_bunco_loc.chips = loc.dictionary.chips
 end
 
 -- Temporary extra chips
@@ -1017,18 +1019,18 @@ create_joker({ -- Bierdeckel
     end
 })
 
-create_joker({ -- Registration Plate (WIP)
+create_joker({ -- Registration Plate
     name = 'Registration Plate', position = 26,
-    vars = {{xmult = 5}, {combination = ''}, {card_list = {}}, {ranks = {}}},
+    vars = {{combination = ''}, {card_list = {}}, {ranks = {}}},
     rarity = 'Rare', cost = 8,
     blueprint = false, eternal = true,
     unlocked = true,
     custom_vars = function(self, info_queue, card)
         local vars
         if card.ability.extra.combination == '' then
-            vars = {card.ability.extra.xmult, '2, 3, 4, 5 '..loc.dictionary.word_and..' 6'}
+            vars = {'2, 3, 4, 5 '..loc.dictionary.word_and..' 6'}
         else
-            vars = {card.ability.extra.xmult, card.ability.extra.combination}
+            vars = {card.ability.extra.combination}
         end
         return {vars = vars}
     end,
@@ -1332,6 +1334,9 @@ create_joker({ -- ROYGBIV
     name = 'ROYGBIV', position = 13,
     vars = {{odds = 7}},
     custom_vars = function(self, info_queue, card)
+
+        info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
+
         local vars
         if G.GAME and G.GAME.probabilities.normal then
             vars = {G.GAME.probabilities.normal, card.ability.extra.odds}
@@ -2211,7 +2216,7 @@ SMODS.Blind{ -- The Sand
     atlas = 'bunco_blinds'
 }
 
-SMODS.Blind{ -- The Blade (WIP)
+SMODS.Blind{ -- The Blade
     key = 'blade', loc_txt = loc.blade,
     boss = {min = 4},
 
@@ -2414,7 +2419,7 @@ SMODS.Blind{ -- Turquoise Shield
 
 SMODS.Atlas({key = 'bunco_decks', path = 'Decks/Decks.png', px = 71, py = 95})
 
-SMODS.Back{
+SMODS.Back{ -- Fairy
 	key = "fairy", loc_txt = loc.fairy,
 
     apply = function()
@@ -2448,18 +2453,144 @@ SMODS.Back{
     atlas = 'bunco_decks'
 }
 
--- Tags
+-- Tags (WIP, I desperately need add_to_pool for these)
 
 SMODS.Atlas({key = 'bunco_tags', path = 'Tags/Tags.png', px = 34, py = 34})
 
-SMODS.Tag{
+SMODS.Tag{ -- Chips
+    key = 'chips', loc_txt = loc.chips,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+
+            hand_chips = mod_chips(hand_chips + 50)
+            update_hand_text({delay = 0}, {chips = hand_chips})
+
+            tag:instayep('+', G.C.CHIPS, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(1),
+    atlas = 'bunco_tags'
+}
+
+SMODS.Tag{ -- Mult
+    key = 'mult', loc_txt = loc.mult,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+
+            mult = mod_mult(mult + 10)
+            update_hand_text({delay = 0}, {mult = mult})
+
+            tag:instayep('+', G.C.MULT, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(2),
+    atlas = 'bunco_tags'
+}
+
+SMODS.Tag{ -- Xmult
+    key = 'xmult', loc_txt = loc.xmult,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+            say(tag.key)
+
+            mult = mod_mult(mult * 1.5)
+            update_hand_text({delay = 0}, {mult = mult})
+
+            tag:instayep('+', G.C.MULT, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(3),
+    atlas = 'bunco_tags'
+}
+
+SMODS.Tag{ -- Xchip
+    key = 'xchips', loc_txt = loc.xchips,
+
+    config = {type = 'hand_played', odds = -1},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+            say(tag.key)
+
+            hand_chips = mod_chips(hand_chips * 1.2)
+            update_hand_text({delay = 0}, {chips = hand_chips})
+
+            tag:instayep('+', G.C.CHIPS, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(4),
+    atlas = 'bunco_tags'
+}
+
+SMODS.Tag{ -- Glitter
+    key = 'glitter', loc_txt = loc.glitter_tag,
+
+    config = {type = 'store_joker_modify', edition = 'bunc_glitter', odds = 4},
+    loc_vars = function(self, info_queue)
+        info_queue[#info_queue+1] = G.P_CENTERS.e_bunc_glitter
+        return {}
+    end,
+
+    apply = function(tag, context)
+        if context.type == 'store_joker_modify' then
+            local applied = nil
+            if not context.card.edition and not context.card.temp_edition and context.card.ability.set == 'Joker' then
+                local lock = tag.ID
+                G.CONTROLLER.locks[lock] = true
+
+                context.card.temp_edition = true
+                tag:yep('+', G.C.DARK_EDITION,function()
+                    context.card:set_edition({bunc_glitter = true}, true)
+                    context.card.ability.couponed = true
+                    context.card:set_cost()
+                    context.card.temp_edition = nil
+                    G.CONTROLLER.locks[lock] = nil
+                    return true
+                end)
+                applied = true
+
+                tag.triggered = true
+            end
+            return applied
+        end
+    end,
+
+    pos = coordinate(5),
+    atlas = 'bunco_tags'
+}
+
+SMODS.Tag{ -- Filigree
     key = 'filigree', loc_txt = loc.filigree,
 
     config = {type = 'standard_pack_opened'},
     apply = function(tag, context)
-        say(context.type)
         if context.type == 'standard_pack_opened' then
-            tag:yep('+', G.C.BUNCO_EXOTIC, function()
+            tag:instayep('+', G.C.BUNCO_EXOTIC, function()
                 return true
             end)
             event({
@@ -2489,5 +2620,29 @@ SMODS.Tag{
         end
     end,
 
+    pos = coordinate(6),
     atlas = 'bunco_tags'
+}
+
+-- Editions
+
+SMODS.Shader({key = 'glitter', path = 'glitter.fs'})
+SMODS.Sound({key = 'glitter', path = 'glitter.ogg'})
+
+SMODS.Edition{
+    key = 'glitter', loc_txt = loc.glitter_edition,
+
+    config = {Xchips = 1.2},
+    loc_vars = function(self, info_queue)
+        return {vars = {self.config.Xchips}}
+    end,
+
+    sound = {sound = 'bunc_glitter', per = 1.2, vol = 0.4},
+    in_shop = true,
+    weight = 9,
+    get_weight = function(self)
+        return G.GAME.edition_rate * self.weight
+    end,
+
+    shader = 'glitter'
 }
