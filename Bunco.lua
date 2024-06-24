@@ -19,6 +19,7 @@
 -- Magenta dagger wobble?
 -- Disable Bierdeckel upgrade message on win
 -- Global variable for glitter (done)
+-- Config for double lovers
 
 local bunco = SMODS.current_mod
 local filesystem = NFS or love.filesystem
@@ -120,14 +121,10 @@ local function forced_message(message, card, color, delay, juice)
     end})
 end
 
--- Exotic add_to_pool function
+-- Exotic in_pool function
 
-add_exotic = function()
-    if G.GAME and G.GAME.Exotic then
-        return {add = true}
-    else
-        return {add = false}
-    end
+exotic_in_pool = function()
+    return G.GAME and G.GAME.Exotic
 end
 
 -- Dictionary wrapper
@@ -228,7 +225,7 @@ local function create_joker(joker)
     local pool
 
     if joker.type == 'Exotic' then
-        pool = add_exotic
+        pool = exotic_in_pool
     end
 
     -- Joker creation
@@ -274,7 +271,7 @@ local function create_joker(joker)
     update = joker.update,
     remove_from_deck = joker.remove,
     add_to_deck = joker.add,
-    add_to_pool = pool,
+    in_pool = pool,
 
     effect = joker.effect
     }
@@ -1422,7 +1419,7 @@ SMODS.Consumable{ -- The Sky
         delay(0.5)
     end,
 
-    add_to_pool = add_exotic
+    in_pool = exotic_in_pool
 }
 
 SMODS.Consumable{ -- The Abyss
@@ -1464,7 +1461,7 @@ SMODS.Consumable{ -- The Abyss
         delay(0.5)
     end,
 
-    add_to_pool = add_exotic
+    in_pool = exotic_in_pool
 }
 
 -- Planets
@@ -1569,22 +1566,11 @@ SMODS.Suit{ -- Fleurons
 
     loc_txt = loc.fleurons,
 
-    should_add_to_deck = function() end,
-
-    disable = function(self)
-        for _, other in pairs(SMODS.Ranks) do
-            self:update_p_card(other, true)
+    in_pool = function(self, args)
+        if args and args.initial_deck then
+            return false
         end
-    end,
-
-    populate = function(self)
-        if G.GAME and G.GAME.Exotic == true then
-            for _, other in pairs(SMODS.Ranks) do
-                if not other.disabled then
-                    self:update_p_card(other)
-                end
-            end
-        end
+        return exotic_in_pool()
     end
 }
 
@@ -1606,22 +1592,11 @@ SMODS.Suit{ -- Halberds
 
     loc_txt = loc.halberds,
 
-    should_add_to_deck = function() end,
-
-    disable = function(self)
-        for _, other in pairs(SMODS.Ranks) do
-            self:update_p_card(other, true)
+    in_pool = function(self, args)
+        if args and args.initial_deck then
+            return false
         end
-    end,
-
-    populate = function(self)
-        if G.GAME and G.GAME.Exotic == true then
-            for _, other in pairs(SMODS.Ranks) do
-                if not other.disabled then
-                    self:update_p_card(other)
-                end
-            end
-        end
+        return exotic_in_pool()
     end
 }
 
@@ -1629,19 +1604,11 @@ SMODS.Suit{ -- Halberds
 
 function disable_exotics()
     if G.GAME then G.GAME.Exotic = false end
-
-    SMODS.Suits.Halberds:disable()
-    SMODS.Suits.Fleurons:disable()
-
     say('Triggered Exotic System disabling.')
 end
 
 function enable_exotics()
     if G.GAME then G.GAME.Exotic = true end
-
-    SMODS.Suits.Halberds:populate()
-    SMODS.Suits.Fleurons:populate()
-
     say('Triggered Exotic System enabling.')
 end
 
@@ -1661,20 +1628,6 @@ function Game:start_run(args)
         end
     else
         saved_game = nil
-    end
-
-    if saved_game then
-        if saved_game.Exotic == nil then
-            saved_game.Exotic = false
-        end
-
-        if saved_game.Exotic == true then
-            enable_exotics()
-        else
-            disable_exotics()
-        end
-    else
-        disable_exotics()
     end
 
     original_start_run(self, args)
@@ -1952,7 +1905,7 @@ SMODS.Blind{ -- The Tine
     boss = {min = 2},
 
     vars = {},
-    loc_vars = function(self, blind)
+    loc_vars = function(self)
         return {vars = {localize(G.GAME.current_round.most_played_rank, 'ranks')}}
     end,
     process_loc_text = function(self)
@@ -1960,8 +1913,8 @@ SMODS.Blind{ -- The Tine
         self.vars = {loc.dictionary.most_played_rank}
     end,
 
-    debuff_card = function(self, blind, card, from_blind)
-        if self.debuff and not self.disabled and card.area ~= G.jokers then
+    debuff_card = function(self, card, from_blind)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.base.value == G.GAME.current_round.most_played_rank then
                 card:set_debuff(true)
                 return true
@@ -1980,11 +1933,11 @@ SMODS.Blind{ -- The Swing
     key = 'swing', loc_txt = loc.swing,
     boss = {min = 3},
 
-    defeat = function(self, blind)
+    defeat = function(self)
         G.GAME.Swing = false
     end,
 
-    stay_flipped = function(self, blind, area, card)
+    stay_flipped = function(self, area, card)
         if G.GAME.Swing == true then
             return true
         else
@@ -2002,13 +1955,13 @@ SMODS.Blind{ -- The Miser
     key = 'miser', loc_txt = loc.miser,
     boss = {min = 2},
 
-    defeat = function(self, blind)
+    defeat = function(self)
         if not self.disabled then
             G.GAME.Miser = true
         end
     end,
 
-    add_to_pool = function()
+    in_pool = function()
         if G.GAME.round_resets.ante < 2 or G.GAME.round_resets.ante % 8 == 7 then
             return false
         else
@@ -2036,8 +1989,8 @@ SMODS.Blind{ -- The Flame
     key = 'flame', loc_txt = loc.flame,
     boss = {min = 3},
 
-    debuff_card = function(self, blind, card, from_blind)
-        if self.debuff and not self.disabled and card.area ~= G.jokers then
+    debuff_card = function(self, card, from_blind)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.config.center ~= G.P_CENTERS.c_base then
                 card:set_debuff(true)
                 return true
@@ -2057,7 +2010,7 @@ SMODS.Blind{ -- The Mask
     boss = {min = 2},
 
     vars = {},
-    loc_vars = function(self, blind)
+    loc_vars = function(self)
         return {vars = {localize(G.GAME.current_round.most_played_poker_hand, 'poker_hands'), localize(G.GAME.current_round.least_played_poker_hand, 'poker_hands')}}
     end,
     process_loc_text = function(self)
@@ -2065,10 +2018,10 @@ SMODS.Blind{ -- The Mask
         self.vars = {localize('ph_most_played'), loc.dictionary.least_played_hand}
     end,
 
-    modify_hand = function(self, blind, cards, poker_hands, text, mult, hand_chips)
-        if self.debuff and not self.disabled then
+    modify_hand = function(self, cards, poker_hands, text, mult, hand_chips)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
             if G.GAME.last_hand_played == G.GAME.current_round.most_played_poker_hand then
-                self.triggered = true
+                G.GAME.blind.triggered = true
                 return G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_mult, G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_chips, true
             end
         end
@@ -2086,7 +2039,7 @@ SMODS.Blind{ -- The Bulwark
     boss = {min = 2},
 
     vars = {},
-    loc_vars = function(self, blind)
+    loc_vars = function(self)
         return {vars = {localize(G.GAME.current_round.most_played_poker_hand, 'poker_hands')}}
     end,
     process_loc_text = function(self)
@@ -2094,8 +2047,8 @@ SMODS.Blind{ -- The Bulwark
         self.vars = {localize('ph_most_played')}
     end,
 
-    press_play = function(self, blind)
-        if self.debuff and not self.disabled then
+    press_play = function(self)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
             if G.FUNCS.get_poker_hand_info(G.hand.highlighted) == G.GAME.current_round.most_played_poker_hand then
                 local original_limit = G.hand.config.highlighted_limit
                 G.E_MANAGER:add_event(Event({ func = function()
@@ -2111,7 +2064,7 @@ SMODS.Blind{ -- The Bulwark
                         G.FUNCS.discard_cards_from_highlighted(nil, true)
                     end
                 return true end }))
-                self.triggered = true
+                G.GAME.blind.triggered = true
                 delay(0.7)
             end
         end
@@ -2127,8 +2080,8 @@ SMODS.Blind{ -- The Knoll
     key = 'knoll', loc_txt = loc.knoll,
     boss = {min = 4},
 
-    stay_flipped = function(self, blind, area, card)
-        if self.debuff and not self.disabled and card.area ~= G.jokers and
+    stay_flipped = function(self, area, card)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers and
         G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0 then
             if G.GAME.dollars > 5 then
                 card:set_debuff(true)
@@ -2148,8 +2101,8 @@ SMODS.Blind{ -- The Stone
 
     boss_colour = HEX('586372'),
 
-    set_blind = function(self, blind, reset, silent)
-        if self.debuff and not self.disabled and G.GAME.dollars >= 10 then
+    set_blind = function(self, reset, silent)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and G.GAME.dollars >= 10 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (math.floor(G.GAME.dollars / 10) + G.GAME.blind.mult)
             local chip_mod = math.ceil((final_chips - G.GAME.blind.chips) / 120) -- iterate over ~120 ticks
             local step = 0
@@ -2181,8 +2134,8 @@ SMODS.Blind{ -- The Sand
 
     boss_colour = HEX('b79131'),
 
-    set_blind = function(self, blind, reset, silent)
-        if self.debuff and not self.disabled and #G.HUD_tags ~= 0 then
+    set_blind = function(self, reset, silent)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and #G.HUD_tags ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (#G.HUD_tags + G.GAME.blind.mult)
             local chip_mod = math.ceil((final_chips - G.GAME.blind.chips) / 120) -- iterate over ~120 ticks
             local step = 0
@@ -2204,7 +2157,7 @@ SMODS.Blind{ -- The Sand
         end
     end,
 
-    add_to_pool = function()
+    in_pool = function()
         if G.GAME.round_resets.ante < 4 or (G.HUD_tags and #G.HUD_tags < 2) then
             return false
         else
@@ -2221,8 +2174,8 @@ SMODS.Blind{ -- The Blade
     boss = {min = 4},
 
     vars = {},
-    loc_vars = function(self, blind)
-        local overscore = get_blind_amount(G.GAME.round_resets.ante)*self.mult*G.GAME.starting_params.ante_scaling
+    loc_vars = function(self)
+        local overscore = get_blind_amount(G.GAME.round_resets.ante)*G.GAME.blind.mult*G.GAME.starting_params.ante_scaling
         overscore = number_format(overscore * 1.5)
         return {vars = {overscore}}
     end,
@@ -2236,7 +2189,7 @@ SMODS.Blind{ -- The Blade
         G.GAME.Blade.chips = G.GAME.chips
     end,
 
-    defeat = function(self, blind)
+    defeat = function()
         G.GAME.Blade = nil
     end,
 
@@ -2270,8 +2223,8 @@ SMODS.Blind{ -- The Cadaver
     key = 'cadaver', loc_txt = loc.cadaver,
     boss = {min = 2},
 
-    debuff_hand = function(self, blind, cards, hand, handname, check)
-        if self.debuff and not self.disabled then
+    debuff_hand = function(self, cards, hand, handname, check)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
             for i = 1, #cards do
                 if cards[i]:is_face() then
                     return true
@@ -2293,8 +2246,8 @@ SMODS.Blind{ -- Chartreuse Crown
     key = 'final_crown', loc_txt = loc.chartreuse_crown,
     boss = {showdown = true, min = 10, max = 10},
 
-    debuff_card = function(self, blind, card, from_blind)
-        if self.debuff and not self.disabled and card.area ~= G.jokers then
+    debuff_card = function(self, card, from_blind)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.base.suit == ('Spades') or
             card.base.suit == ('Hearts') or
             card.base.suit == ('Clubs') or
@@ -2308,7 +2261,7 @@ SMODS.Blind{ -- Chartreuse Crown
         end
     end,
 
-    add_to_pool = function()
+    in_pool = function()
         local exotic_amount = 0
 
         if G.playing_cards then
@@ -2338,7 +2291,7 @@ SMODS.Blind{ -- Vermilion Trident
     key = 'final_trident', loc_txt = loc.vermilion_trident,
     boss = {showdown = true, min = 10, max = 10},
 
-    defeat = function(self, blind)
+    defeat = function(self)
         G.GAME.Trident = false
     end,
 
@@ -2352,8 +2305,8 @@ SMODS.Blind{ -- Indigo Tower
     key = 'final_tower', loc_txt = loc.indigo_tower,
     boss = {showdown = true, min = 10, max = 10},
 
-    debuff_card = function(self, blind, card, from_blind)
-        if self.debuff and not self.disabled and card.area ~= G.jokers then
+    debuff_card = function(self, card, from_blind)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
             if not card.ability.played_this_ante then
                 card:set_debuff(true)
                 return true
@@ -2382,8 +2335,8 @@ SMODS.Blind{ -- Turquoise Shield
     key = 'final_shield', loc_txt = loc.turquoise_shield,
     boss = {showdown = true, min = 10, max = 10},
 
-    set_blind = function(self, blind, reset, silent)
-        if self.debuff and not self.disabled and G.GAME.overscore ~= 0 then
+    set_blind = function(self, reset, silent)
+        if G.GAME.blind.debuff and not G.GAME.blind.disabled and G.GAME.overscore ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) + (G.GAME.overscore or 0)
             local chip_mod = math.ceil((final_chips - G.GAME.blind.chips) / 120) -- iterate over ~120 ticks
             local step = 0
@@ -2405,7 +2358,7 @@ SMODS.Blind{ -- Turquoise Shield
         end
     end,
 
-    defeat = function(self, blind)
+    defeat = function(self)
         G.GAME.Shield = false
     end,
 
@@ -2453,99 +2406,9 @@ SMODS.Back{ -- Fairy
     atlas = 'bunco_decks'
 }
 
--- Tags (WIP, I desperately need add_to_pool for these)
+-- Tags
 
 SMODS.Atlas({key = 'bunco_tags', path = 'Tags/Tags.png', px = 34, py = 34})
-
-SMODS.Tag{ -- Chips
-    key = 'chips', loc_txt = loc.chips,
-
-    config = {type = 'hand_played'},
-    apply = function(tag, context)
-        if context.type == 'hand_played' then
-
-            hand_chips = mod_chips(hand_chips + 50)
-            update_hand_text({delay = 0}, {chips = hand_chips})
-
-            tag:instayep('+', G.C.CHIPS, function()
-                return true
-            end, 0)
-            tag.triggered = true
-            return true
-        end
-    end,
-
-    pos = coordinate(1),
-    atlas = 'bunco_tags'
-}
-
-SMODS.Tag{ -- Mult
-    key = 'mult', loc_txt = loc.mult,
-
-    config = {type = 'hand_played'},
-    apply = function(tag, context)
-        if context.type == 'hand_played' then
-
-            mult = mod_mult(mult + 10)
-            update_hand_text({delay = 0}, {mult = mult})
-
-            tag:instayep('+', G.C.MULT, function()
-                return true
-            end, 0)
-            tag.triggered = true
-            return true
-        end
-    end,
-
-    pos = coordinate(2),
-    atlas = 'bunco_tags'
-}
-
-SMODS.Tag{ -- Xmult
-    key = 'xmult', loc_txt = loc.xmult,
-
-    config = {type = 'hand_played'},
-    apply = function(tag, context)
-        if context.type == 'hand_played' then
-            say(tag.key)
-
-            mult = mod_mult(mult * 1.5)
-            update_hand_text({delay = 0}, {mult = mult})
-
-            tag:instayep('+', G.C.MULT, function()
-                return true
-            end, 0)
-            tag.triggered = true
-            return true
-        end
-    end,
-
-    pos = coordinate(3),
-    atlas = 'bunco_tags'
-}
-
-SMODS.Tag{ -- Xchip
-    key = 'xchips', loc_txt = loc.xchips,
-
-    config = {type = 'hand_played', odds = -1},
-    apply = function(tag, context)
-        if context.type == 'hand_played' then
-            say(tag.key)
-
-            hand_chips = mod_chips(hand_chips * 1.2)
-            update_hand_text({delay = 0}, {chips = hand_chips})
-
-            tag:instayep('+', G.C.CHIPS, function()
-                return true
-            end, 0)
-            tag.triggered = true
-            return true
-        end
-    end,
-
-    pos = coordinate(4),
-    atlas = 'bunco_tags'
-}
 
 SMODS.Tag{ -- Glitter
     key = 'glitter', loc_txt = loc.glitter_tag,
@@ -2580,8 +2443,106 @@ SMODS.Tag{ -- Glitter
         end
     end,
 
+    pos = coordinate(1),
+    atlas = 'bunco_tags',
+}
+
+SMODS.Tag{ -- Chips
+    key = 'chips', loc_txt = loc.chips,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+
+            hand_chips = mod_chips(hand_chips + 50)
+            update_hand_text({delay = 0}, {chips = hand_chips})
+
+            tag:instayep('+', G.C.CHIPS, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(3),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
+SMODS.Tag{ -- Mult
+    key = 'mult', loc_txt = loc.mult,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+
+            mult = mod_mult(mult + 10)
+            update_hand_text({delay = 0}, {mult = mult})
+
+            tag:instayep('+', G.C.MULT, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(4),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
+SMODS.Tag{ -- Xmult
+    key = 'xmult', loc_txt = loc.xmult,
+
+    config = {type = 'hand_played'},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+            say(tag.key)
+
+            mult = mod_mult(mult * 1.5)
+            update_hand_text({delay = 0}, {mult = mult})
+
+            tag:instayep('+', G.C.MULT, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
     pos = coordinate(5),
-    atlas = 'bunco_tags'
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
+SMODS.Tag{ -- Xchip
+    key = 'xchips', loc_txt = loc.xchips,
+
+    config = {type = 'hand_played', odds = -1},
+    apply = function(tag, context)
+        if context.type == 'hand_played' then
+            say(tag.key)
+
+            hand_chips = mod_chips(hand_chips * 1.2)
+            update_hand_text({delay = 0}, {chips = hand_chips})
+
+            tag:instayep('+', G.C.CHIPS, function()
+                return true
+            end, 0)
+            tag.triggered = true
+            return true
+        end
+    end,
+
+    pos = coordinate(6),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
 }
 
 SMODS.Tag{ -- Filigree
@@ -2620,8 +2581,10 @@ SMODS.Tag{ -- Filigree
         end
     end,
 
-    pos = coordinate(6),
-    atlas = 'bunco_tags'
+    pos = coordinate(7),
+    atlas = 'bunco_tags',
+
+    in_pool = exotic_in_pool
 }
 
 -- Editions
@@ -2632,7 +2595,7 @@ SMODS.Sound({key = 'glitter', path = 'glitter.ogg'})
 SMODS.Edition{
     key = 'glitter', loc_txt = loc.glitter_edition,
 
-    config = {Xchips = 1.2},
+    config = {Xchips = 1.3},
     loc_vars = function(self, info_queue)
         return {vars = {self.config.Xchips}}
     end,
@@ -2645,4 +2608,20 @@ SMODS.Edition{
     end,
 
     shader = 'glitter'
+}
+
+SMODS.Shader({key = 'fluorescent', path = 'fluorescent.fs'})
+-- SMODS.Sound({key = 'fluorescent', path = 'fluorescent.ogg'})
+
+SMODS.Edition{
+    key = 'fluorescent', loc_txt = loc.fluorescent_edition,
+
+    -- sound = {sound = 'bunc_fluorescent', per = 1.2, vol = 0.4},
+    in_shop = true,
+    weight = 9,
+    get_weight = function(self)
+        return G.GAME.edition_rate * self.weight
+    end,
+
+    shader = 'fluorescent'
 }
