@@ -13,6 +13,19 @@ return {
             exceeded_score = 'Exceeded the limit!',
             temporary_extra_chips = {['text'] = {[1] = '{C:chips}+#1#{} extra chips this round'}}
         },
+        ['zh_CN'] = {
+            copied = '复制！',
+            nothing = '无',
+            chips = '筹码',
+            loop = 'Loop!',
+            chance = '几率',
+            word_and = '和',
+            most_played_rank = '（最常出点数）',
+            least_played_hand = '（最少出牌型）',
+            blade = '（1.5X盲注得分要求）',
+            exceeded_score = '越限！',
+            temporary_extra_chips = {['text'] = {[1] = '本回合内{C:chips}+#1#{}额外筹码'}}
+        },
         ['fr'] = {
             nothing = 'Rien'
         }
@@ -24,12 +37,20 @@ return {
         ['en-us'] = {
             singular = 'Fleuron',
             plural = 'Fleurons',
+        },
+        ['zh_CN'] = {
+            singular = '印花',
+            plural = '印花',
         }
     },
     halberds = {
         ['en-us'] = {
             singular = 'Halberd',
             plural = 'Halberds',
+        },
+        ['zh_CN'] = {
+            singular = '斧枪',
+            plural = '斧枪',
         }
     },
 
@@ -555,7 +576,14 @@ return {
                 [1] = 'Playing or discarding costs',
                 [2] = 'both play and discard'
             }
-        }
+        },
+        ['zh_CN'] = {
+            ['name'] = '围篱',
+            ['text'] = {
+                [1] = '出牌或弃牌时',
+                [2] = '出牌和弃牌次数均会被消耗'
+            }
+        },
     },
     umbrella = {
         ['en-us'] = {
@@ -563,6 +591,13 @@ return {
             ['text'] = {
                 [1] = 'After Play, all non-flipped',
                 [2] = 'cards get flipped'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '伞',
+            ['text'] = {
+                [1] = '出牌后，将所有',
+                [2] = '正面朝上的卡牌翻面'
             }
         }
     },
@@ -581,6 +616,13 @@ return {
             ['text'] = {
                 [1] = 'After Play or Discard,',
                 [2] = 'all cards are flipped'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '秋千',
+            ['text'] = {
+                [1] = '出牌或弃牌后',
+                [2] = '将所有卡牌翻面'
             }
         }
     },
@@ -681,6 +723,13 @@ return {
                 [1] = 'Selected non-flipped',
                 [2] = 'cards are flipped'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '帷幕',
+            ['text'] = {
+                [1] = '选中正面朝上的卡牌时',
+                [2] = '将其翻面'
+            }
         }
     },
     cadaver = {
@@ -738,6 +787,13 @@ return {
                 [1] = 'Excess score this Ante adds',
                 [2] = "to this blind's required score"
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '青绿之盾',
+            ['text'] = {
+                [1] = '当前底注中各回合得分的超额部分',
+                [2] = "将被添加至本盲注的得分要求"
+            }
         }
     },
 
@@ -765,14 +821,27 @@ return {
                 [2] = 'Joker is free and',
                 [3] = 'becomes {C:dark_edition}Glitter'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '流光标签',
+            ['text'] = {
+                [1] = '商店中的下一张无版本小丑牌',
+                [2] = '将变为{C:dark_edition}流光{}且售价为0'
+            }
         }
     },
     chips = {
         ['en-us'] = {
             ['name'] = 'Chips Tag',
             ['text'] = {
-                [1] = 'Adds {C:chips}+50{} Chips',
+                [1] = 'Adds  Chips',
                 [2] = 'to the next hand'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '筹码标签',
+            ['text'] = {
+                [1] = '下次出牌{C:chips}+50{}筹码'
             }
         }
     },
@@ -783,6 +852,12 @@ return {
                 [1] = 'Adds {C:mult}+10{} Mult',
                 [2] = 'to the next hand'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '倍率标签',
+            ['text'] = {
+                [1] = '下次出牌{C:mult}+10{}倍率'
+            }
         }
     },
     xmult = {
@@ -791,6 +866,12 @@ return {
             ['text'] = {
                 [1] = 'Adds {X:mult,C:white}X1.5{} Mult',
                 [2] = 'to the next hand'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '超级倍率标签',
+            ['text'] = {
+                [1] = '下次出牌{X:mult,C:white}X1.5{}倍率'
             }
         }
     },
@@ -801,6 +882,12 @@ return {
                 [1] = 'Adds {X:chips,C:white}X1.2{} Chips',
                 [2] = 'to the next hand'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '极限筹码标签',
+            ['text'] = {
+                [1] = '下次出牌{X:chips,C:white}X1.2{}筹码'
+            }
         }
     },
     filigree = {
@@ -809,6 +896,13 @@ return {
             ['text'] = {
                 [1] = 'Standard Pack has',
                 [2] = 'only {C:bunco_exotic}Exotic suits'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '金缕标签',
+            ['text'] = {
+                [1] = '标准包仅包含',
+                [2] = '{C:bunco_exotic}异域{}花色的卡牌'
             }
         }
     },
@@ -822,6 +916,13 @@ return {
             ['text'] = {
                 [1] = '{X:chips,C:white}X#1#{} Chips'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '流光',
+            ['label'] = '流光',
+            ['text'] = {
+                [1] = '{X:chips,C:white}X#1#{}筹码'
+            }
         }
     },
     fluorescent_edition = {
@@ -831,6 +932,15 @@ return {
             ['text'] = {
                 [1] = 'Cannot be flipped, debuffed',
                 [2] = 'or forced to be selected'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '荧光',
+            ['label'] = '荧光',
+            ['text'] = {
+                [1] = '保持正面朝上',
+                [2] = '不可强制选定',
+                [3] = '永不失效'
             }
         }
     }
