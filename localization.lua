@@ -840,7 +840,7 @@ return {
             ['name'] = '流光标签',
             ['text'] = {
                 [1] = '商店中的下一张无版本小丑牌',
-                [2] = '将变为{C:dark_edition}流光{}且售价为0'
+                [2] = '将变为{C:dark_edition}流光{}且售价为{C:money}$0'
             }
         }
     },
@@ -851,6 +851,13 @@ return {
                 [1] = 'Next base edition shop',
                 [2] = 'Joker is free and',
                 [3] = 'becomes {C:dark_edition}Fluorescent'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '荧光标签',
+            ['text'] = {
+                [1] = '商店中的下一张无版本小丑牌',
+                [2] = '将变为{C:dark_edition}荧光{}且售价为{C:money}$0'
             }
         }
     },
