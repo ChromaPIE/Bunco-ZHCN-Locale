@@ -22,7 +22,7 @@
 -- (done) Config for double lovers
 -- Fix suit colors
 -- (done) Talisman support
--- Make tags use global values of editions (+ loc vars for it)
+-- (done) Make tags use global values of editions (+ loc vars for it)
 -- Make editioned consumables and replace their info_queue
 -- (done) Fix bulwark stray pixels
 -- (done) Add config to the consumable editions
@@ -1460,7 +1460,7 @@ create_joker({ -- ROYGBIV
                         end
                     end
 
-                    if cards and #cards > 0 then cards[math.random(#cards)]:set_edition({polychrome = true}) end
+                    if cards and #cards > 0 then cards[math.random(#cards)]:set_edition({polychrome = true}, true) end
                 end
             end
         end
@@ -1639,6 +1639,47 @@ SMODS.Consumable{ -- Makemake
         local target_text = G.localization.descriptions[self.set]['c_mercury'].text
         SMODS.Consumable.process_loc_text(self)
         G.localization.descriptions[self.set][self.key].text = target_text
+    end
+}
+
+-- Spectrals
+
+SMODS.Atlas({key = 'bunco_spectrals', path = 'Consumables/Spectrals.png', px = 71, py = 95})
+
+SMODS.Consumable{ -- Cleanse
+    set = 'Spectral', atlas = 'bunco_spectrals',
+    key = 'cleanse', loc_txt = loc.cleanse,
+
+    config = {max_highlighted = 3},
+    pos = coordinate(1),
+
+    loc_vars = function(self, info_queue)
+        info_queue[#info_queue+1] = G.P_CENTERS.e_bunc_fluorescent
+        return {vars = {self.config.max_highlighted}}
+    end,
+
+    can_use = function(self, card)
+        if G.hand and (#G.hand.highlighted <= self.config.max_highlighted) and G.hand.highlighted[1] then
+            local condition = true
+            for i = 1, #G.hand.highlighted do
+                if G.hand.highlighted[i].edition then
+                    condition = false
+                end
+            end
+            if condition then return true end
+        end
+        return false
+    end,
+
+    use = function(self, card)
+        local edition = {bunc_fluorescent = true}
+        for i = 1, #G.hand.highlighted do
+            event({trigger = 'after', delay = 0.1, func = function()
+                local highlighted = G.hand.highlighted[i]
+                highlighted:set_edition(edition, true)
+            return true end })
+        end
+        card:juice_up(0.3, 0.5)
     end
 }
 
@@ -2606,10 +2647,13 @@ SMODS.Tag{ -- Chips
     key = 'chips', loc_txt = loc.chips,
 
     config = {type = 'hand_played'},
+    loc_vars = function(self, info_queue)
+        return {vars = {G.P_CENTERS.e_foil.config.extra}}
+    end,
     apply = function(tag, context)
         if context.type == 'hand_played' then
 
-            hand_chips = mod_chips(hand_chips + 50)
+            hand_chips = mod_chips(hand_chips + G.P_CENTERS.e_foil.config.extra)
             update_hand_text({delay = 0}, {chips = hand_chips})
 
             tag:instayep('+', G.C.CHIPS, function()
@@ -2630,10 +2674,13 @@ SMODS.Tag{ -- Mult
     key = 'mult', loc_txt = loc.mult,
 
     config = {type = 'hand_played'},
+    loc_vars = function(self, info_queue)
+        return {vars = {G.P_CENTERS.e_holo.config.extra}}
+    end,
     apply = function(tag, context)
         if context.type == 'hand_played' then
 
-            mult = mod_mult(mult + 10)
+            mult = mod_mult(mult + G.P_CENTERS.e_holo.config.extra)
             update_hand_text({delay = 0}, {mult = mult})
 
             tag:instayep('+', G.C.MULT, function()
@@ -2654,10 +2701,13 @@ SMODS.Tag{ -- Xmult
     key = 'xmult', loc_txt = loc.xmult,
 
     config = {type = 'hand_played'},
+    loc_vars = function(self, info_queue)
+        return {vars = {G.P_CENTERS.e_polychrome.config.extra}}
+    end,
     apply = function(tag, context)
         if context.type == 'hand_played' then
 
-            mult = mod_mult(mult * 1.5)
+            mult = mod_mult(mult * G.P_CENTERS.e_polychrome.config.extra)
             update_hand_text({delay = 0}, {mult = mult})
 
             tag:instayep('+', G.C.MULT, function()
@@ -2678,10 +2728,13 @@ SMODS.Tag{ -- Xchip
     key = 'xchips', loc_txt = loc.xchips,
 
     config = {type = 'hand_played', odds = -1},
+    loc_vars = function(self, info_queue)
+        return {vars = {G.P_CENTERS.e_bunc_glitter.config.Xchips}}
+    end,
     apply = function(tag, context)
         if context.type == 'hand_played' then
 
-            hand_chips = mod_chips(hand_chips * 1.2)
+            hand_chips = mod_chips(hand_chips * G.P_CENTERS.e_bunc_glitter.config.Xchips)
             update_hand_text({delay = 0}, {chips = hand_chips})
 
             tag:instayep('+', G.C.CHIPS, function()

@@ -144,6 +144,15 @@ return {
             name = 'Makemake'
         }
     },
+    cleanse = {
+        ['en-us'] = {
+            ['name'] = 'Cleanse',
+            ['text'] = {
+                [1] = 'Adds {C:dark_edition}Fluorescent{} to',
+                [2] = '{C:attention}#1#{} selected cards in hand'
+            }
+        }
+    },
 
 
     -- Jokers
@@ -876,14 +885,14 @@ return {
         ['en-us'] = {
             ['name'] = 'Chips Tag',
             ['text'] = {
-                [1] = 'Adds  Chips',
+                [1] = 'Adds {C:chips}+#1#{} Chips',
                 [2] = 'to the next hand'
             }
         },
         ['zh_CN'] = {
             ['name'] = '筹码标签',
             ['text'] = {
-                [1] = '下次出牌{C:chips}+50{}筹码'
+                [1] = '下次出牌{C:chips}+#1#{}筹码'
             }
         }
     },
@@ -891,14 +900,14 @@ return {
         ['en-us'] = {
             ['name'] = 'Mult Tag',
             ['text'] = {
-                [1] = 'Adds {C:mult}+10{} Mult',
+                [1] = 'Adds {C:mult}+#1#{} Mult',
                 [2] = 'to the next hand'
             }
         },
         ['zh_CN'] = {
             ['name'] = '倍率标签',
             ['text'] = {
-                [1] = '下次出牌{C:mult}+10{}倍率'
+                [1] = '下次出牌{C:mult}+#1#{}倍率'
             }
         }
     },
@@ -906,14 +915,14 @@ return {
         ['en-us'] = {
             ['name'] = 'Megamult Tag',
             ['text'] = {
-                [1] = 'Adds {X:mult,C:white}X1.5{} Mult',
+                [1] = 'Adds {X:mult,C:white}X#1#{} Mult',
                 [2] = 'to the next hand'
             }
         },
         ['zh_CN'] = {
             ['name'] = '超级倍率标签',
             ['text'] = {
-                [1] = '下次出牌{X:mult,C:white}X1.5{}倍率'
+                [1] = '下次出牌{X:mult,C:white}X#1#{}倍率'
             }
         }
     },
@@ -921,14 +930,14 @@ return {
         ['en-us'] = {
             ['name'] = 'Ultrachips Tag',
             ['text'] = {
-                [1] = 'Adds {X:chips,C:white}X1.2{} Chips',
+                [1] = 'Adds {X:chips,C:white}X#1#{} Chips',
                 [2] = 'to the next hand'
             }
         },
         ['zh_CN'] = {
             ['name'] = '极限筹码标签',
             ['text'] = {
-                [1] = '下次出牌{X:chips,C:white}X1.2{}筹码'
+                [1] = '下次出牌{X:chips,C:white}X#1#{}筹码'
             }
         }
     },
