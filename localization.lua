@@ -62,6 +62,12 @@ return {
             description = {
                 '5 cards with different suits'
             }
+        },
+        ['zh_CN'] = {
+            name = '缤彩',
+            description = {
+                '5张花色各不相同的牌'
+            }
         }
     },
     straight_spectrum = {
@@ -857,10 +863,10 @@ return {
             }
         },
         ['zh_CN'] = {
-            ['name'] = '流光标签',
+            ['name'] = '溢彩标签',
             ['text'] = {
                 [1] = '商店中的下一张无版本小丑牌',
-                [2] = '将变为{C:dark_edition}流光{}且售价为{C:money}$0'
+                [2] = '将变为{C:dark_edition}溢彩{}且售价为{C:money}$0'
             }
         }
     },
@@ -969,8 +975,8 @@ return {
             }
         },
         ['zh_CN'] = {
-            ['name'] = '流光',
-            ['label'] = '流光',
+            ['name'] = '溢彩',
+            ['label'] = '溢彩',
             ['text'] = {
                 [1] = '{X:chips,C:white}X#1#{}筹码'
             }
