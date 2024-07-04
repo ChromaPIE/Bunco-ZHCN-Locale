@@ -23,7 +23,7 @@
 -- Fix suit colors
 -- (done) Talisman support
 -- (done) Make tags use global values of editions (+ loc vars for it)
--- Make editioned consumables and replace their info_queue
+-- (1/2) Make editioned consumables and replace their info_queue (to check: common events.lua)
 -- (done) Fix bulwark stray pixels
 -- (done) Add config to the consumable editions
 -- (done) Remove debuff when fluorescent edition is applied to a debuffed card
@@ -117,7 +117,7 @@ local function forced_message(message, card, color, delay, juice)
 
     event({trigger = 'before', delay = delay, func = function()
 
-        if juice == true then juice:juice_up(0.7) end
+        if juice then juice:juice_up(0.7) end
 
         card_eval_status_text(
             card,
@@ -297,6 +297,7 @@ end
 -- Jokers
 
 function bunco.set_debuff(card)
+    -- Gameplan
     local my_pos = nil
     for i = 1, #G.jokers.cards do
         if G.jokers.cards[i] == card then my_pos = i; break end
@@ -305,6 +306,11 @@ function bunco.set_debuff(card)
     if my_pos then
         if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
         if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
+    end
+
+    -- Fluorescent things
+    if card.edition and card.edition.bunc_fluorescent then
+        return 'prevent_debuff'
     end
 
     return false
@@ -1142,6 +1148,7 @@ create_joker({ -- Neon
     calculate = function(self, card, context)
         if context.debuffed_card then
             card.ability.extra.xmult = card.ability.extra.xmult + 0.2
+            forced_message(localize('k_upgrade_ex'), card, G.C.MULT, true)
         end
 
         if context.joker_main then
