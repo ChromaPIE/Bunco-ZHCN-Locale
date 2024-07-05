@@ -7,6 +7,7 @@ return {
             loop = 'Loop!',
             chance = 'Chance',
             word_and = 'and',
+            mysterious_tarot = 'Tarot?',
             most_played_rank = '(most played rank)',
             least_played_hand = '(least played hand)',
             blade = '(1.5X blind score)',
@@ -51,6 +52,18 @@ return {
         ['zh_CN'] = {
             singular = '斧枪',
             plural = '斧枪',
+        }
+    },
+
+    -- Exotic cards
+
+    exotic_cards = {
+        ['en-us'] = {
+            ['name'] = 'Exotic cards',
+            ['text'] = {
+                [1] = 'Cards with',
+                [2] = '{C:fleurons}Fleuron{} or {C:halberds}Halberd{} suit'
+            }
         }
     },
 
@@ -189,9 +202,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Voxel Joker',
             ['text'] = {
-                [1] = '{X:mult,C:white}X#1#{} Mult, {X:mult,C:white}-X0.1{} Mult for each',
+                [1] = '{X:mult,C:white}X#1#{} Mult, {X:mult,C:white}-X#2#{} Mult for each',
                 [2] = '{C:attention}Enhanced card{} in your full deck',
-                [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
+                [3] = '{C:inactive}(Currently {X:mult,C:white}X#3#{C:inactive} Mult)'
             }
         }
     },
@@ -220,9 +233,9 @@ return {
         ['en-us'] = {
             ['name'] = 'X-Ray',
             ['text'] = {
-                [1] = 'Gains {X:mult,C:white}X0.2{} Mult',
+                [1] = 'Gains {X:mult,C:white}X#1#{} Mult',
                 [2] = 'per card drawn face down',
-                [3] = '{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)'
+                [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
             }
         }
     },
@@ -273,7 +286,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Loan Shark',
             ['text'] = {
-                [1] = 'Grants {C:money}$50',
+                [1] = 'Grants {C:money}$#1#',
                 [2] = 'when acquired...'
             }
         }
@@ -291,9 +304,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Shepherd Joker',
             ['text'] = {
-                [1] = 'Gains {C:chips}+6{} Chips',
+                [1] = 'Gains {C:chips}+#1#{} Chips',
                 [2] = 'when played hand contains a {C:attention}Pair',
-                [3] = '{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)'
+                [3] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)'
             }
         }
     },
@@ -443,9 +456,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Neon Joker',
             ['text'] = {
-                [1] = 'Gains {X:mult,C:white}X0.2{} Mult',
+                [1] = 'Gains {X:mult,C:white}X#1#{} Mult',
                 [2] = 'per debuffed card scored',
-                [3] = '{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)'
+                [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
             }
         }
     },
@@ -600,9 +613,10 @@ return {
         ['en-us'] = {
             ['name'] = 'Rigoletto',
             ['text'] = {
-                [1] = 'Each scored card permanently',
-                [2] = 'gains {C:red}+#1#{} Mult if played hand',
-                [3] = 'contains {C:halberds}Halberds{} or {C:fleurons}Fleurons'
+                [1] = '{X:mult,C:white}X#1#{} Mult for each',
+                [2] = '{C:bunco_exotic}Exotic card{}',
+                [3] = 'in your {C:attention}full deck',
+                [4] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
             }
         }
     },
@@ -844,8 +858,8 @@ return {
             ['name'] = 'Fairy Deck',
             ['text'] = {
                 [1] = 'After defeating each',
-                [2] = '{C:attention}Boss Blind{}, add 4',
-                [3] = "random {C:bunco_exotic}Exotic cards",
+                [2] = '{C:attention}Boss Blind{}, add #1#',
+                [3] = "random {C:bunco_exotic,T:exotic_cards}#2#",
                 [4] = "to your deck"
             }
         }
@@ -952,7 +966,7 @@ return {
             ['name'] = 'Filigree Tag',
             ['text'] = {
                 [1] = 'Standard Pack has',
-                [2] = 'only {C:bunco_exotic}Exotic suits'
+                [2] = 'only {C:bunco_exotic}Exotic cards'
             }
         },
         ['zh_CN'] = {
