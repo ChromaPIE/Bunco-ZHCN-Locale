@@ -21,6 +21,7 @@ return {
             loop = 'Loop!',
             chance = '几率',
             word_and = '和',
+            mysterious_tarot = '塔罗牌？',
             most_played_rank = '（最常出点数）',
             least_played_hand = '（最少出牌型）',
             blade = '（1.5X盲注得分要求）',
@@ -63,6 +64,12 @@ return {
             ['text'] = {
                 [1] = 'Cards with',
                 [2] = '{C:fleurons}Fleuron{} or {C:halberds}Halberd{} suit'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '异域牌',
+            ['text'] = {
+                [1] = '花色为{C:fleurons}印花{}或{C:halberds}斧枪{}的牌'
             }
         }
     },
@@ -972,8 +979,7 @@ return {
         ['zh_CN'] = {
             ['name'] = '金缕标签',
             ['text'] = {
-                [1] = '标准包仅包含',
-                [2] = '{C:bunco_exotic}异域{}花色的卡牌'
+                [1] = '标准包仅包含{C:bunco_exotic}异域{}牌'
             }
         }
     },
