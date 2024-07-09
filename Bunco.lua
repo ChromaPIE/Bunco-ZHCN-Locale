@@ -261,6 +261,7 @@ local function create_joker(joker)
         cost = joker.cost,
 
         unlocked = joker.unlocked,
+        check_for_unlock = joker.check_for_unlock,
         discovered = false,
 
         blueprint_compat = joker.blueprint,
@@ -300,20 +301,33 @@ end
 -- Jokers
 
 function bunco.set_debuff(card)
-    -- Gameplan
+    -- Fluorescent edition
+    if card.edition and card.edition.bunc_fluorescent then
+        return 'prevent_debuff'
+    end
+
+    -- Jokers
+
     local my_pos = nil
     for i = 1, #G.jokers.cards do
         if G.jokers.cards[i] == card then my_pos = i; break end
     end
+
+    -- Gameplan
 
     if my_pos then
         if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
         if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
     end
 
-    -- Fluorescent things
-    if card.edition and card.edition.bunc_fluorescent then
-        return 'prevent_debuff'
+    -- Conquest
+
+    for i = 1, #G.jokers.cards do
+        if G.jokers.cards[i].ability.name == 'Conquest' then
+            if G.jokers.cards[i].ability.extra.joker ~= 0 and card == G.jokers.cards[i].ability.extra.joker then
+                return true
+            end
+        end
     end
 
     return false
@@ -447,7 +461,7 @@ create_joker({ -- Crop Circles
 
             local other_card = context.other_card
 
-            if other_card.ability.effect ~= 'Stone Card' then
+            if other_card.config.center ~= G.P_CENTERS.m_stone then
 
                 if other_card.base.suit == ('Fleurons') then
                     if other_card:get_id() == 8 then
@@ -504,7 +518,13 @@ create_joker({ -- Xray
     vars = {{bonus = 0.2}, {xmult = 1}},
     rarity = 'Common', cost = 4,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_challenge' and G.GAME.challenge == 'c_xray_1' then
+            self.challenge_bypass = true
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.emplaced_card and context.emplaced_card.facing == 'back' and not context.blueprint then
             card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.bonus
@@ -678,7 +698,14 @@ create_joker({ -- Loan Shark
     vars = {{dollars = 50}, {cost = -100}},
     rarity = 'Uncommon', cost = 3,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'money' then
+            if G.GAME.dollars < -20 then
+                unlock_card(self)
+            end
+        end
+    end,
     add = function(self, card)
         ease_dollars(card.ability.extra.dollars)
         card.ability.extra_value = card.ability.extra.cost - card.sell_cost
@@ -804,7 +831,7 @@ create_joker({ -- JMJB
                     blocking = false,
                     func = function()
 
-                        if G.pack_cards and G.pack_cards.cards ~= nil and G.pack_cards.cards[1] and G.pack_cards.VT.y < G.ROOM.T.h then
+                        if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and G.pack_cards.VT.y < G.ROOM.T.h then
 
                             for _, v in ipairs(G.pack_cards.cards) do
                                 if v.config.center == G.P_CENTERS.c_base then
@@ -834,8 +861,9 @@ create_joker({ -- Dogs Playing Poker
 
             if context.scoring_hand ~= nil then
                 for i = 1, #context.scoring_hand do
-                    if context.scoring_hand[i]:get_id() >= 6 or
-                    context.scoring_hand[i]:get_id() < 2 then
+                    if (context.scoring_hand[i]:get_id() >= 6 or
+                    context.scoring_hand[i]:get_id() < 2) and
+                    context.scoring_hand[i].config.center ~= G.P_CENTERS.m_stone then
                         condition = false
                     end
                 end
@@ -861,7 +889,12 @@ create_joker({ -- Righthook
     vars = {},
     rarity = 'Rare', cost = 8,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'repetition' and args.repetition_amount >= 5 then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.repetition and context.cardarea == G.play and context.scoring_hand ~= nil and context.other_card == context.scoring_hand[#context.scoring_hand] then
 
@@ -890,7 +923,13 @@ create_joker({ -- Fiendish
     end,
     rarity = 'Uncommon', cost = 5,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_challenge' and G.GAME.challenge == 'c_double_nothing_1' then
+            self.challenge_bypass = true
+            unlock_card(self)
+        end
+    end,
     purist = false
 })
 
@@ -1069,7 +1108,13 @@ create_joker({ -- Registration Plate
     vars = {{combination = ''}, {card_list = {}}, {ranks = {}}},
     rarity = 'Rare', cost = 8,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_challenge' and G.GAME.challenge == 'c_city_1' then
+            self.challenge_bypass = true
+            unlock_card(self)
+        end
+    end,
     custom_vars = function(self, info_queue, card)
         local vars
         if card.ability.extra.combination == '' then
@@ -1186,6 +1231,13 @@ create_joker({ -- Gameplan
             end
         end
     end,
+    remove = function(self, card)
+        if G.jokers then
+            for i = 1, #G.jokers.cards do
+                G.GAME.blind:debuff_card(G.jokers.cards[i])
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local mult = 0
@@ -1208,6 +1260,333 @@ create_joker({ -- Gameplan
                     card = card
                 }
             end
+        end
+    end
+})
+
+create_joker({ -- Conquest
+    name = 'Conquest', position = 30,
+    vars = {{chips = 200}, {joker = 0}},
+    rarity = 'Uncommon', cost = 5,
+    blueprint = false, eternal = true,
+    unlocked = true,
+    update = function(self, card)
+        if G.jokers then
+            for i = 1, #G.jokers.cards do
+                G.GAME.blind:debuff_card(G.jokers.cards[i])
+            end
+        end
+    end,
+    remove = function(self, card)
+        if G.jokers then
+            for i = 1, #G.jokers.cards do
+                G.GAME.blind:debuff_card(G.jokers.cards[i])
+            end
+        end
+    end,
+    calculate = function(self, card, context)
+        if context.setting_blind then
+            local my_pos = nil
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == card then my_pos = i; break end
+            end
+
+            if #G.jokers.cards > 1 then
+                card.ability.extra.joker = G.jokers.cards[math.random(#G.jokers.cards)]
+                while card.ability.extra.joker == G.jokers.cards[my_pos] do
+                    card.ability.extra.joker = G.jokers.cards[math.random(#G.jokers.cards)]
+                end
+            else
+                card.ability.extra.joker = 0
+            end
+
+            if card.ability.extra.joker ~= 0 then
+                forced_message(loc.dictionary.debuffed, card, G.C.RED, true, card.ability.extra.joker)
+            end
+        end
+        if context.joker_main then
+            return {
+                message = localize {
+                    type = 'variable',
+                    key = 'a_chips',
+                    vars = { card.ability.extra.chips }
+                },
+                chip_mod = card.ability.extra.chips,
+                card = card
+            }
+        end
+    end
+})
+
+create_joker({ -- Hierarchy of Needs
+    name = 'Hierarchy of Needs', position = 31,
+    vars = {{bonus = 5}, {mult = 20}},
+    rarity = 'Common', cost = 5,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    update = function(self, card)
+        if G.playing_cards then
+            local required_ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'}
+            local set_count = 0
+
+            for _, suit_data in pairs(SMODS.Suits) do
+                local suit = tostring(suit_data.key)
+                local rank_count = {}
+
+                for _, rank in ipairs(required_ranks) do
+                    rank_count[rank] = 0
+                end
+
+                for _, deck_card in ipairs(G.playing_cards) do
+                    local rank
+
+                    if deck_card.config.center ~= G.P_CENTERS.m_stone and deck_card.base.suit == suit then
+                        rank = deck_card.base.value
+                    end
+
+                    if rank and rank_count[rank] then
+                        rank_count[rank] = rank_count[rank] + 1
+
+                        local complete_set = true
+                        for _, req_rank in ipairs(required_ranks) do
+                            if rank_count[req_rank] == 0 then
+                                complete_set = false
+                                break
+                            end
+                        end
+
+                        if complete_set then
+                            set_count = set_count + 1
+                            for _, req_rank in ipairs(required_ranks) do
+                                rank_count[req_rank] = rank_count[req_rank] - 1
+                            end
+                        end
+                    end
+                end
+            end
+            card.ability.extra.mult = card.ability.extra.bonus * set_count
+        else
+            card.ability.extra.mult = card.ability.extra.bonus * 4
+        end
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            if card.ability.extra.mult ~= 0 then
+                return {
+                    message = localize {
+                        type = 'variable',
+                        key = 'a_mult',
+                        vars = { card.ability.extra.mult }
+                    },
+                    mult_mod = card.ability.extra.mult,
+                    card = card
+                }
+            end
+        end
+    end
+})
+
+create_joker({ -- Dwarven
+    name = 'Dwarven', position = 32,
+    custom_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_stone
+        info_queue[#info_queue+1] = G.P_CENTERS.m_steel
+        info_queue[#info_queue+1] = G.P_CENTERS.m_gold
+        return {}
+    end,
+    rarity = 'Uncommon', cost = 8,
+    blueprint = false, eternal = true,
+    unlocked = true,
+    update = function(self, card)
+        if card.area == G.jokers and not card.debuff then
+            G.P_CENTERS.m_stone.config.h_x_mult = G.P_CENTERS.m_steel.config.h_x_mult
+            G.P_CENTERS.m_stone.config.h_dollars = G.P_CENTERS.m_gold.config.h_dollars
+        end
+    end,
+    remove = function(self, card)
+        G.P_CENTERS.m_stone.config.h_x_mult = nil
+        G.P_CENTERS.m_stone.config.h_dollars = nil
+    end
+})
+
+create_joker({ -- Aristocrat
+    name = 'Aristocrat', position = 33,
+    rarity = 'Uncommon', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.open_booster and context.card.ability.name then
+            event({
+                trigger = 'after',
+                delay = 1.3 * math.sqrt(G.SETTINGS.GAMESPEED),
+                blockable = false,
+                blocking = false,
+                func = function()
+                    if G.pack_cards.VT.y < G.ROOM.T.h then
+                        G.GAME.pack_choices = G.GAME.pack_choices + 1
+                        if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] then
+                            if G.GAME.pack_choices > #G.pack_cards.cards then
+                                G.GAME.pack_choices = #G.pack_cards.cards
+                            end
+                        end
+                    end
+                    return true
+                end
+            })
+        end
+    end
+})
+
+create_joker({ -- Metallurgist
+    name = 'Metallurgist', position = 34,
+    vars = {{mult = 10}},
+    custom_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_gold
+        return {vars = {card.ability.extra.mult}}
+    end,
+    rarity = 'Common', cost = 6,
+    blueprint = false, eternal = true,
+    unlocked = true,
+    update = function(self, card)
+        if card.area == G.jokers and not card.debuff then
+            G.P_CENTERS.m_gold.config.h_mult = card.ability.extra.mult
+        end
+    end,
+    remove = function(self, card)
+        G.P_CENTERS.m_gold.config.h_x_mult = 0
+    end
+})
+
+create_joker({ -- Juggalo
+    name = 'Juggalo', position = 35,
+    custom_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.e_foil
+        info_queue[#info_queue+1] = G.P_CENTERS.e_holo
+        info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
+        info_queue[#info_queue+1] = G.P_CENTERS.e_bunc_glitter
+        return {}
+    end,
+    rarity = 'Rare', cost = 8,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.setting_blind then
+            if G.consumeables.cards[1] then
+                local consumables_table = {}
+                for i = 1, #G.consumeables.cards do
+                    if G.consumeables.cards[i]:get_edition() == nil then
+                        table.insert(consumables_table, G.consumeables.cards[i])
+                    end
+                end
+                local consumable = consumables_table[math.random(#consumables_table)]
+                local edition = poll_edition('standard_edition'..G.GAME.round_resets.ante, nil, true, true,
+                {'e_holo', 'e_foil', 'e_polychrome', 'e_bunc_glitter'})
+                if consumable then
+                    event({func = function()
+                        consumable:set_edition(edition, true)
+                        return true
+                    end})
+                    forced_message(localize('k_upgrade_ex'), card, G.C.RED, true, consumable)
+                end
+            end
+        end
+    end
+})
+
+create_joker({ -- Head in the Clouds
+    name = 'Head in the Clouds', position = 36,
+    vars = {{odds = 3}},
+    custom_vars = function(self, info_queue, card)
+        local vars
+        if G.GAME and G.GAME.probabilities.normal then
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds}
+        else
+            vars = {1, card.ability.extra.odds}
+        end
+        return {vars = vars}
+    end,
+    rarity = 'Uncommon', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.level_up_hand and context.level_up_hand ~= self.name then
+            if pseudorandom('head_in_the_clouds'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+                event({func = function()
+                    local hand = 'High Card'
+                    card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = localize('k_upgrade_ex')})
+                    update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(hand, 'poker_hands'),chips = G.GAME.hands[hand].chips, mult = G.GAME.hands[hand].mult, level=G.GAME.hands[hand].level})
+                    level_up_hand(context.blueprint_card or card, self.name, nil, 1)
+                    update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+                return true end})
+            end
+        end
+    end
+})
+
+create_joker({ -- Headshot
+    name = 'Headshot', position = 37,
+    vars = {{xmult = 3}},
+    rarity = 'Uncommon', cost = 8,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.joker_main and context.scoring_hand then
+            local face_amount = 0
+            for i = 1, #context.scoring_hand do
+                if context.scoring_hand[i]:is_face() then
+                    face_amount = face_amount + 1
+                end
+            end
+
+            if face_amount == 1 then
+                return {
+                    Xmult_mod = card.ability.extra.xmult,
+                    card = card,
+                    message = localize {
+                        type = 'variable',
+                        key = 'a_xmult',
+                        vars = { card.ability.extra.xmult }
+                    },
+                }
+            end
+        end
+    end
+})
+
+create_joker({ -- Trigger Finger
+    name = 'Trigger Finger', position = 38,
+    vars = {{xmult = 4}, {odds = 10}},
+    custom_vars = function(self, info_queue, card)
+        local vars
+        if G.GAME and G.GAME.probabilities.normal then
+            vars = {card.ability.extra.xmult, G.GAME.probabilities.normal, card.ability.extra.odds}
+        else
+            vars = {card.ability.extra.xmult, 1, card.ability.extra.odds}
+        end
+        return {vars = vars}
+    end,
+    rarity = 'Rare', cost = 8,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.select_card then
+            event({trigger = 'after', func = function()
+                if #G.hand.highlighted[1] then
+                    forced_message(loc.dictionary.pew, card, G.C.RED)
+                    G.FUNCS.play_cards_from_highlighted()
+                end
+            return true end})
+        end
+        if context.joker_main then
+            return {
+                Xmult_mod = card.ability.extra.xmult,
+                card = card,
+                message = localize {
+                    type = 'variable',
+                    key = 'a_xmult',
+                    vars = { card.ability.extra.xmult }
+                },
+            }
         end
     end
 })
@@ -2576,6 +2955,8 @@ SMODS.Back{ -- Fairy
     loc_vars = function(self)
         return {vars = {self.config.amount, localize{type = 'name_text', set = 'Other', key = 'exotic_cards'}}}
     end,
+
+    unlocked = false,
 
     apply = function()
         enable_exotics()

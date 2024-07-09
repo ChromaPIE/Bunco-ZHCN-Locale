@@ -7,6 +7,8 @@ return {
             loop = 'Loop!',
             chance = 'Chance',
             word_and = 'and',
+            debuffed = 'Debuffed!',
+            pew = 'Pew!',
             mysterious_tarot = 'Tarot?',
             most_played_rank = '(most played rank)',
             least_played_hand = '(least played hand)',
@@ -21,6 +23,8 @@ return {
             loop = 'Loop!',
             chance = '几率',
             word_and = '和',
+            debuffed = '失效！',
+            pew = 'Biu！',
             mysterious_tarot = '塔罗牌？',
             most_played_rank = '（最常出点数）',
             least_played_hand = '（最少出牌型）',
@@ -70,6 +74,18 @@ return {
             ['name'] = '异域牌',
             ['text'] = {
                 [1] = '花色为{C:fleurons}印花{}或{C:halberds}斧枪{}的牌'
+            }
+        }
+    },
+
+    -- Exotic cards
+
+    exotic_cards = {
+        ['en-us'] = {
+            ['name'] = 'Exotic cards',
+            ['text'] = {
+                [1] = 'Cards with',
+                [2] = '{C:fleurons}Fleuron{} or {C:halberds}Halberd{} suit'
             }
         }
     },
@@ -243,6 +259,10 @@ return {
                 [1] = 'Gains {X:mult,C:white}X#1#{} Mult',
                 [2] = 'per card drawn face down',
                 [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
+            },
+            ['unlock'] = {
+                [1] = 'Beat the {E:1,C:attention}X-ray Vision',
+                [2] = 'challenge'
             }
         }
     },
@@ -295,6 +315,10 @@ return {
             ['text'] = {
                 [1] = 'Grants {C:money}$#1#',
                 [2] = 'when acquired...'
+            },
+            ['unlock'] = {
+                [1] = 'Have less than {E:1,C:attention}$-20',
+                [2] = 'during a single run'
             }
         }
     },
@@ -341,8 +365,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Dogs Playing Poker',
             ['text'] = {
-                [1] = '{X:mult,C:white}X#1#{} Mult if all scored',
-                [2] = 'cards are {C:attention}2{}, {C:attention}3{}, {C:attention}4{}, or {C:attention}5{}'
+                [1] = '{X:mult,C:white}X#1#{} Mult if every scored',
+                [2] = 'rank is {C:attention}2{}, {C:attention}3{}, {C:attention}4{}, or {C:attention}5'
             }
         }
     },
@@ -353,6 +377,11 @@ return {
                 [1] = 'Retrigger rightmost played card',
                 [2] = 'the same amount of times as',
                 [3] = 'your current amount of hands'
+            },
+            ['unlock'] = {
+                [1] = 'Retrigger played',
+                [2] = 'card at least',
+                [3] = '{E:1,C:attention}5 times{} in a row'
             }
         }
     },
@@ -363,6 +392,10 @@ return {
                 [1] = 'Doubles all sources of money,',
                 [2] = '{C:green}#1# in #2#{} chance to pay out',
                 [3] = 'with {C:money}$1{} instead'
+            },
+            ['unlock'] = {
+                [1] = 'Beat the {E:1,C:attention}Double or Nothing',
+                [2] = 'challenge'
             }
         }
     },
@@ -446,6 +479,10 @@ return {
                 [2] = 'has the Chips and Mult of all',
                 [3] = '{C:attention}poker hands{} played this game',
                 [4] = '{s:0.8}Combination changes every round'
+            },
+            ['unlock'] = {
+                [1] = 'Beat the {E:1,C:attention}15 Minute City',
+                [2] = 'challenge'
             }
         }
     },
@@ -477,6 +514,115 @@ return {
                 [2] = 'to the left and right,',
                 [3] = 'each Joker next to this Joker',
                 [4] = 'grants {C:mult}+#1#{} Mult'
+            }
+        }
+    },
+    conquest = {
+        ['en-us'] = {
+            ['name'] = 'Conquest',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips,',
+                [2] = '{C:red}Debuffs{} random Joker',
+                [3] = 'when {C:attention}Blind{} is selected'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '征服',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{}筹码',
+                [2] = '选择{C:attention}盲注{}时',
+                [3] = '使随机一张小丑牌{C:red}失效'
+            }
+        }
+    },
+    hierarchy_of_needs = {
+        ['en-us'] = {
+            ['name'] = 'Hierarchy of Needs',
+            ['text'] = {
+                [1] = '{C:red}+#1#{} Mult for each',
+                [2] = '{C:attention}full set of suit{} in',
+                [3] = 'your {C:attention}full deck',
+                [4] = '{C:inactive}(Currently {C:red}+#2#{C:inactive} Mult)'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '需求层次',
+            ['text'] = {
+                [1] = '{C:attention}完整牌组{}中',
+                [2] = '每有一种{C:attention}花色',
+                [3] = '拥有{C:attention}所有点数的牌',
+                [4] = '{C:red}+#1#{}倍率',
+                [5] = '{C:inactive}（当前为{C:red}+#2#{C:inactive}倍率）'
+            }
+        }
+    },
+    dwarven = {
+        ['en-us'] = {
+            ['name'] = 'Dwarven Joker',
+            ['text'] = {
+                [1] = 'Held in hand {C:attention}Stone Cards{}',
+                [2] = 'have abilities of {C:attention}Steel Cards{}',
+                [3] = 'and {C:attention}Gold Cards'
+            }
+        }
+    },
+    aristocrat = {
+        ['en-us'] = {
+            ['name'] = 'Aristocrat',
+            ['text'] = {
+                [1] = 'An additional card can be',
+                [2] = 'selected from {C:attention}Booster Packs'
+            }
+        }
+    },
+    metallurgist = {
+        ['en-us'] = {
+            ['name'] = 'Metallurgist',
+            ['text'] = {
+                [1] = 'Held in hand {C:attention}Gold Cards{}',
+                [2] = 'give {C:red}+#1#{} Mult'
+            }
+        }
+    },
+    juggalo = {
+        ['en-us'] = {
+            ['name'] = 'Juggalo',
+            ['text'] = {
+                [1] = 'Adds {C:dark_edition}Foil{}, {C:dark_edition}Holographic{},',
+                [2] = '{C:dark_edition}Polychrome{} or {C:dark_edition}Glitter{} edition',
+                [3] = 'to a random {C:attention}consumable{}',
+                [4] = 'when {C:attention}Blind{} is selected'
+            }
+        }
+    },
+    head_in_the_clouds = {
+        ['en-us'] = {
+            ['name'] = 'Head in the Clouds',
+            ['text'] = {
+                [1] = '{C:green}#1# in #2#{} chance to upgrade',
+                [2] = '{C:attention}High Card{} when upgrading',
+                [3] = 'any {C:attention}poker hand'
+            }
+        }
+    },
+    headshot = {
+        ['en-us'] = {
+            ['name'] = 'Headshot',
+            ['text'] = {
+                [1] = '{X:mult,C:white}X#1#{} Mult if played hand',
+                [2] = 'contains only a single',
+                [3] = 'scoring {C:attention}face card{}'
+            }
+        }
+    },
+    trigger_finger = {
+        ['en-us'] = {
+            ['name'] = 'Trigger Finger',
+            ['text'] = {
+                [1] = '{X:mult,C:white}X#1#{} Mult,',
+                [2] = '{C:attention}selecting{} a card',
+                [3] = 'has a {C:green}#2# in #3#{} chance to',
+                [4] = 'play highlighted cards'
             }
         }
     },
@@ -868,6 +1014,10 @@ return {
                 [2] = '{C:attention}Boss Blind{}, add #1#',
                 [3] = "random {C:bunco_exotic,T:exotic_cards}#2#",
                 [4] = "to your deck"
+            },
+            ['unlock'] = {
+                [1] = 'Play {E:1,C:attention}5 different suits',
+                [2] = 'in a single hand'
             }
         }
     },

@@ -441,7 +441,7 @@ end
 
 '''
 
-# function evaluate_play (Nil Bill)
+# function evaluate_play (Nil Bill, Neon)
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
@@ -497,6 +497,49 @@ payload = '''
 if hand == 'h_bunc_Deal' then return end
 '''
 
+# function level_up_hand (Head in the Clouds)
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = "function level_up_hand(card, hand, instant, amount)"
+position = 'after'
+match_indent = true
+payload = '''
+
+if G.jokers ~= nil then
+    for _, v in ipairs(G.jokers.cards) do
+        if v.ability.name == 'Head in the Clouds' and not v.debuff then
+            v:calculate_joker({level_up_hand = hand})
+        end
+    end
+end
+
+if hand == 'Head in the Clouds' then hand = 'High Card' end
+
+'''
+
+# function Card:highlight (Trigger Finger)
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = 'self.highlighted = is_higlighted'
+position = 'after'
+match_indent = true
+payload = '''
+
+if G.jokers ~= nil then
+    for _, v in ipairs(G.jokers.cards) do
+        if v.ability.name == 'Trigger Finger' and is_higlighted and self.area == G.hand then
+            if pseudorandom('trigger_finger'..G.SEED) < G.GAME.probabilities.normal / v.ability.extra.odds then
+                v:calculate_joker({select_card = true})
+                break
+            end
+        end
+    end
+end
+
+'''
+
 # function Card:is_suit (Myopia & Astigmatism)
 [[patches]]
 [patches.pattern]
@@ -549,6 +592,58 @@ if G.jokers ~= nil then
 end
 
 '''
+
+# Challenge cards unlocking 1/2
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = "unlock_achievement('rule_bender')"
+position = 'before'
+match_indent = true
+payload = '''
+
+local challenge_card
+
+for i = 1, #G.P_LOCKED do
+    challenge_card = G.P_LOCKED[i]
+
+    if not challenge_card.unlocked and challenge_card.check_for_unlock and type(challenge_card.check_for_unlock) == 'function' then
+        challenge_card:check_for_unlock({type = 'win_challenge'})
+    end
+end
+
+'''
+
+# Challenge cards unlocking 2/2
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = "if G.GAME.seeded or G.GAME.challenge then return end"
+position = 'at'
+match_indent = true
+payload = '''if G.GAME.seeded or (G.GAME.challenge and not card.challenge_bypass) then return end'''
+
+# Repetition unlocking
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = 'for j=1,#reps do'
+position = 'before'
+match_indent = true
+payload = '''
+
+local locked_card
+
+for i = 1, #G.P_LOCKED do
+    locked_card = G.P_LOCKED[i]
+
+    if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+        locked_card:check_for_unlock({type = 'repetition', repetition_amount = #reps})
+    end
+end
+
+'''
+
 
 # G.FUNCS.discard_cards_from_highlighted() (The Paling 1/2)
 [[patches]]
@@ -970,7 +1065,7 @@ local function calculate_discard()
     end
 end
 
-if e.antiscore then
+if e and e.antiscore then
     ease_discard(-1)
     calculate_discard()
 else
@@ -988,7 +1083,7 @@ position = 'at'
 match_indent = true
 payload = '''
 
-if e.antiscore then
+if e and e.antiscore then
     G.FUNCS.evaluate_play(e)
 else
     G.FUNCS.evaluate_play()
