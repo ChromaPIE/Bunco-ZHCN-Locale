@@ -3,47 +3,6 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
-# UI Suit hiding, part 1/4
-[[patches]]
-[patches.pattern]
-target = 'main.lua'
-pattern = "table.insert(n.nodes, tally_sprite("
-position = 'before'
-match_indent = true
-payload = '''
-
-if suit_tallies[suit_map[i]] ~= 0 then
-
-'''
-
-# UI Suit hiding, part 2/4
-[[patches]]
-[patches.regex]
-target = 'main.lua'
-pattern = "(?<indent>[\t ]*)suit_map\\[\\s*i\\s*\\]\\s*\\)\\s*\\)"
-position = 'after'
-line_prepend = '$indent'
-payload = '''end'''
-
-
-# UI Suit hiding, part 3/4
-[[patches]]
-[patches.pattern]
-target = 'main.lua'
-pattern = "if not SMODS.Suits[suit].disabled then"
-position = 'at'
-match_indent = true
-payload = '''if (not SMODS.Suits[suit].disabled) and (suit_counts[suit] ~= 0) then'''
-
-# UI Suit hiding, part 4/4
-[[patches]]
-[patches.pattern]
-target = 'main.lua'
-pattern = "if not SMODS.Suits[v].disabled then"
-position = 'at'
-match_indent = true
-payload = '''if (not SMODS.Suits[v].disabled) and (suit_counts[v] ~= 0) then'''
-
 # Exotics toggle
 [[patches]]
 [patches.pattern]
@@ -552,10 +511,10 @@ payload = '''
 if G.jokers ~= nil then
     for _, v in ipairs(G.jokers.cards) do
         if v.ability.name == 'Myopia' and not v.debuff then
-            if self.base.suit == 'Spades' and (self.base.suit == 'Spades') == (suit == 'Spades' or suit == 'Halberds') then
+            if self.base.suit == 'Spades' and (self.base.suit == 'Spades') == (suit == 'Spades' or suit == 'bunc_Halberds') then
                 return true
             end
-            if self.base.suit == 'Clubs' and (self.base.suit == 'Clubs') == (suit == 'Clubs' or suit == 'Halberds') then
+            if self.base.suit == 'Clubs' and (self.base.suit == 'Clubs') == (suit == 'Clubs' or suit == 'bunc_Halberds') then
                 return true
             end
         end
@@ -565,10 +524,10 @@ end
 if G.jokers ~= nil then
     for _, v in ipairs(G.jokers.cards) do
         if v.ability.name == 'Astigmatism' and not v.debuff then
-            if self.base.suit == 'Hearts' and (self.base.suit == 'Hearts') == (suit == 'Hearts' or suit == 'Fleurons') then
+            if self.base.suit == 'Hearts' and (self.base.suit == 'Hearts') == (suit == 'Hearts' or suit == 'bunc_Fleurons') then
                 return true
             end
-            if self.base.suit == 'Diamonds' and (self.base.suit == 'Diamonds') == (suit == 'Diamonds' or suit == 'Fleurons') then
+            if self.base.suit == 'Diamonds' and (self.base.suit == 'Diamonds') == (suit == 'Diamonds' or suit == 'bunc_Fleurons') then
                 return true
             end
         end
@@ -578,13 +537,13 @@ end
 if G.jokers ~= nil then
     for _, v in ipairs(G.jokers.cards) do
         if v.ability.name == 'Smeared Joker' and not v.debuff then
-            if self.base.suit == 'Fleurons' and (suit ~= 'Fleurons') then
+            if self.base.suit == 'bunc_Fleurons' and (suit ~= 'bunc_Fleurons') then
                 return false
             end
-            if self.base.suit == 'Halberds' and (suit ~= 'Halberds') then
+            if self.base.suit == 'bunc_Halberds' and (suit ~= 'bunc_Halberds') then
                 return false
             end
-            if (self.base.suit ~= 'Fleurons' and self.base.suit ~= 'Halberds') and (suit == 'Fleurons' or suit == 'Halberds') then
+            if (self.base.suit ~= 'bunc_Fleurons' and self.base.suit ~= 'bunc_Halberds') and (suit == 'bunc_Fleurons' or suit == 'bunc_Halberds') then
                 return false
             end
         end

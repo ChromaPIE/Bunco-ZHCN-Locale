@@ -28,6 +28,8 @@
 -- (done) Add config to the consumable editions
 -- (done) Remove debuff when fluorescent edition is applied to a debuffed card
 -- (done) Make tarot badges use localization
+-- (done) Pawn and linocut fake suit and rank
+-- Check eternal food compat
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
@@ -109,6 +111,10 @@ local function event(config)
     }))
 end
 
+local function big_juice(card)
+    card:juice_up(0.7)
+end
+
 local function forced_message(message, card, color, delay, juice)
     if delay == true then
         delay = 0.7 * 1.25
@@ -118,7 +124,7 @@ local function forced_message(message, card, color, delay, juice)
 
     event({trigger = 'before', delay = delay, func = function()
 
-        if juice then juice:juice_up(0.7) end
+        if juice then big_juice(juice) end
 
         card_eval_status_text(
             card,
@@ -291,6 +297,7 @@ local function create_joker(joker)
         update = joker.update,
         remove_from_deck = joker.remove,
         add_to_deck = joker.add,
+        set_ability = joker.set_ability,
         in_pool = pool,
 
         effect = joker.effect
@@ -331,6 +338,20 @@ function bunco.set_debuff(card)
     end
 
     return false
+end
+
+local original_start_run = Game.start_run
+
+function Game:start_run(args)
+    original_start_run(self, args)
+
+    local sledgehammers = SMODS.find_card('j_bunc_sledgehammer')
+    for _, card in ipairs(sledgehammers) do
+        G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
+    end
+    if #sledgehammers >= 1 then
+        G.P_CENTERS.m_glass.config.extra = G.P_CENTERS.m_glass.config.extra / SMODS.Jokers['j_bunc_sledgehammer'].config.extra.div_chance_denom
+    end
 end
 
 create_joker({ -- Cassette
@@ -645,17 +666,12 @@ create_joker({ -- Linocut
     blueprint = false, eternal = true,
     unlocked = true,
     calculate = function(self, card, context)
-        if not context.blueprint then
-            if context.individual and context.cardarea == G.play and context.poker_hands and next(context.poker_hands['Pair']) then
-
-                if context.scoring_hand ~= nil and #context.scoring_hand == 2 and context.scoring_hand[1] == context.other_card then
-                    G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[1]:flip(); play_sound('card1', 1); context.scoring_hand[1]:juice_up(0.3, 0.3); return true end }))
-                    G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.1,  func = function() context.scoring_hand[1]:change_suit(context.scoring_hand[2].config.card.suit); return true end }))
-                    G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[1]:flip(); play_sound('tarot2', 1, 0.6); context.scoring_hand[1]:juice_up(0.3, 0.3); return true end }))
-
-                    forced_message(loc.dictionary.copied, card, G.C.RED, true)
-
-                end
+        if context.after and context.scoring_hand ~= nil and #context.scoring_hand == 2 and not context.blueprint then
+            if context.poker_hands and next(context.poker_hands['Pair']) then
+                event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[1]:flip(); play_sound('card1', 1); context.scoring_hand[1]:juice_up(0.3, 0.3); return true end })
+                event({trigger = 'after', delay = 0.1,  func = function() context.scoring_hand[1]:change_suit(context.scoring_hand[2].config.card.suit); return true end })
+                event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[1]:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); context.scoring_hand[1]:juice_up(0.3, 0.3); return true end })
+                forced_message(loc.dictionary.copied, card, G.C.RED, true)
             end
         end
     end
@@ -777,14 +793,14 @@ create_joker({ -- Knight
         if context.setting_blind and not card.getting_sliced and not context.blueprint then
             card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.bonus
 
-            G.E_MANAGER:add_event(Event({ trigger = 'after', delay = 0.2, func = function()
-                G.E_MANAGER:add_event(Event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 0.85);return true end })) 
+            event({ trigger = 'after', delay = 0.2, func = function()
+                event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 0.85);return true end })
                 delay(0.15)
-                G.E_MANAGER:add_event(Event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1.15);return true end })) 
+                event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1.15);return true end })
                 delay(0.15)
-                G.E_MANAGER:add_event(Event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1);return true end })) 
+                event({ func = function() G.jokers:shuffle('aajk'); play_sound('cardSlide1', 1);return true end })
                 delay(0.5)
-            return true end }))
+            return true end })
 
             forced_message('+'..tostring(card.ability.extra.mult)..' '..localize('k_mult'), card, G.C.RED)
         end
@@ -965,19 +981,21 @@ create_joker({ -- Carnival
 
 create_joker({ -- Sledgehammer
     name = 'Sledgehammer', position = 20,
-    vars = {{new_xmult = 3}, {new_chance = 1}},
+    vars = {{plus_xmult = 1}, {div_chance_denom = 4}},
     rarity = 'Uncommon', cost = 5,
     blueprint = false, eternal = true,
     unlocked = true,
-    update = function(self, card)
-        if card.area == G.jokers and not card.debuff then
-            G.P_CENTERS.m_glass.config.Xmult = card.ability.extra.new_xmult
-            G.P_CENTERS.m_glass.config.extra = card.ability.extra.new_chance
+    add = function(self, card)
+        G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
+        if #SMODS.find_card('j_bunc_sledgehammer') == 1 then
+            G.P_CENTERS.m_glass.config.extra = G.P_CENTERS.m_glass.config.extra / self.config.extra.div_chance_denom
         end
     end,
     remove = function(self, card)
-        G.P_CENTERS.m_glass.config.Xmult = 2
-        G.P_CENTERS.m_glass.config.extra = 4
+        G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult - card.ability.extra.plus_xmult
+        if #SMODS.find_card('j_bunc_sledgehammer') == 0 then
+            G.P_CENTERS.m_glass.config.extra = G.P_CENTERS.m_glass.config.extra * self.config.extra.div_chance_denom
+        end
     end
 })
 
@@ -1591,6 +1609,111 @@ create_joker({ -- Trigger Finger
     end
 })
 
+create_joker({ -- Hopscotch
+    name = 'Hopscotch', position = 39,
+    vars = {{discard = 1}},
+    rarity = 'Common', cost = 4,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.before and context.poker_hands ~= nil and next(context.poker_hands['Straight']) then
+            ease_discard(card.ability.extra.discard)
+            forced_message('+'..card.ability.extra.discard..' '..localize('b_discard'), card, G.C.RED, true)
+        end
+    end
+})
+
+create_joker({ -- Pawn
+    name = 'Pawn', position = 40,
+    rarity = 'Common', cost = 5,
+    blueprint = false, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.after and context.scoring_hand ~= nil and not context.blueprint then
+            for i = 1, #context.scoring_hand do
+                local condition = false
+                local other_card = context.scoring_hand[i]
+                local rank = math.huge
+                for _, deck_card in ipairs(G.playing_cards) do
+                    if deck_card:get_id() < rank then
+                        rank = deck_card:get_id()
+                    end
+                end
+                if other_card:get_id() == rank then
+                    condition = true
+                    event({trigger = 'after', delay = 0.15, func = function() other_card:flip(); play_sound('card1', 1); other_card:juice_up(0.3, 0.3); return true end })
+                    event({
+                        trigger = 'after',
+                        delay = 0.1,
+                        func = function()
+                            local suit_data = SMODS.Suits[other_card.base.suit]
+                            local suit_prefix = suit_data.card_key
+                            local rank_data = SMODS.Ranks[other_card.base.value]
+                            local behavior = rank_data.strength_effect or { fixed = 1, ignore = false, random = false }
+                            local rank_suffix = ''
+                            if behavior.ignore or not next(rank_data.next) then
+                                return true
+                            elseif behavior.random then
+                                -- TODO doesn't respect in_pool
+                                local r = pseudorandom_element(rank_data.next, pseudoseed('strength'))
+                                rank_suffix = SMODS.Ranks[r].card_key
+                            else
+                                local ii = (behavior.fixed and rank_data.next[behavior.fixed]) and behavior.fixed or 1
+                                rank_suffix = SMODS.Ranks[rank_data.next[ii]].card_key
+                            end
+                            other_card:set_base(G.P_CARDS[suit_prefix .. '_' .. rank_suffix])
+                            return true
+                        end
+                    })
+                    event({trigger = 'after', delay = 0.15, func = function() other_card:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); other_card:juice_up(0.3, 0.3); return true end })
+                end
+                if condition then delay(0.7 * 1.25) end
+            end
+        end
+    end
+})
+
+create_joker({ -- Puzzle Board
+    name = 'Puzzle Board', position = 41,
+    vars = {{odds = 4}},
+    custom_vars = function(self, info_queue, card)
+
+        info_queue[#info_queue+1] = G.P_CENTERS.e_foil
+        info_queue[#info_queue+1] = G.P_CENTERS.e_holo
+        info_queue[#info_queue+1] = G.P_CENTERS.e_polychrome
+
+        local vars
+        if G.GAME and G.GAME.probabilities.normal then
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds}
+        else
+            vars = {1, card.ability.extra.odds}
+        end
+        return {vars = vars}
+    end,
+    rarity = 'Uncommon', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.using_consumeable and context.consumeable.ability.set == 'Tarot' then
+            if pseudorandom('puzzle_board'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
+                local cards = {}
+                local edition = poll_edition('wheel_of_fortune', nil, true, true)
+
+                for i = 1, #G.hand.highlighted do
+                    if G.hand.highlighted[i]:get_edition() == nil then
+                        table.insert(cards, G.hand.highlighted[i])
+                    end
+                end
+
+                if cards and #cards > 0 then
+                    big_juice(card)
+                    cards[math.random(#cards)]:set_edition(edition, true)
+                end
+            end
+        end
+    end
+})
+
 -- Exotic Jokers
 
 create_joker({ -- Zealous
@@ -1785,16 +1908,18 @@ create_joker({ -- Fondue
             enable_exotics()
 
             for i = 1, #context.scoring_hand do
-                G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[i]:flip(); play_sound('card1', 1); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end }))
+                event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[i]:flip(); play_sound('card1', 1); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end })
             end
 
             for i = 1, #context.scoring_hand do
-                G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.1,  func = function() context.scoring_hand[i]:change_suit('bunc_Fleurons'); return true end }))
+                event({trigger = 'after', delay = 0.1,  func = function() context.scoring_hand[i]:change_suit('bunc_Fleurons'); return true end })
             end
 
             for i = 1, #context.scoring_hand do
-                G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[i]:flip(); play_sound('tarot2', 1, 0.6); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end }))
+                event({trigger = 'after', delay = 0.15, func = function() context.scoring_hand[i]:flip(); play_sound('tarot2', 1, 0.6); big_juice(card); context.scoring_hand[i]:juice_up(0.3, 0.3); return true end })
             end
+
+            delay(0.7 * 1.25)
         end
     end
 })
@@ -1847,7 +1972,10 @@ create_joker({ -- ROYGBIV
                         end
                     end
 
-                    if cards and #cards > 0 then cards[math.random(#cards)]:set_edition({polychrome = true}, true) end
+                    if cards and #cards > 0 then
+                        big_juice(card)
+                        cards[math.random(#cards)]:set_edition({polychrome = true}, true) 
+                    end
                 end
             end
         end
@@ -2111,6 +2239,7 @@ SMODS.Atlas({key = 'bunco_suits_hc', path = 'Exotic/ExoticSuitsHC.png', px = 18,
 SMODS.Suit{ -- Fleurons
     key = 'Fleurons',
     card_key = 'FLEURON',
+    hidden = true,
 
     lc_atlas = 'bunco_cards',
     hc_atlas = 'bunco_cards_hc',
@@ -2137,6 +2266,7 @@ SMODS.Suit{ -- Fleurons
 SMODS.Suit{ -- Halberds
     key = 'Halberds',
     card_key = 'HALBERD',
+    hidden = true,
 
     lc_atlas = 'bunco_cards',
     hc_atlas = 'bunco_cards_hc',
@@ -2170,28 +2300,6 @@ end
 function enable_exotics()
     if G.GAME then G.GAME.Exotic = true end
     say('Triggered Exotic System enabling.')
-end
-
-local original_start_run = Game.start_run
-
-function Game:start_run(args)
-
-    local saved_game
-
-    if args.savetext then
-        if not G.SAVED_GAME then
-            G.SAVED_GAME = get_compressed(G.SETTINGS.profile..'/'..'save.jkr')
-            if G.SAVED_GAME ~= nil then G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME) end
-        end
-        if G.SAVED_GAME ~= nil then
-            saved_game = G.SAVED_GAME.GAME
-        end
-    else
-        saved_game = nil
-    end
-
-    original_start_run(self, args)
-
 end
 
 -- Poker hands
@@ -2611,7 +2719,7 @@ SMODS.Blind{ -- The Bulwark
         if G.GAME.blind.debuff and not G.GAME.blind.disabled then
             if G.FUNCS.get_poker_hand_info(G.hand.highlighted) == G.GAME.current_round.most_played_poker_hand then
                 local original_limit = G.hand.config.highlighted_limit
-                G.E_MANAGER:add_event(Event({ func = function()
+                event({ func = function()
                     G.hand.config.highlighted_limit = math.huge
                     if G.hand.cards then
                         for k, v in ipairs(G.hand.cards) do
@@ -2623,7 +2731,7 @@ SMODS.Blind{ -- The Bulwark
                         G.hand.config.highlighted_limit = original_limit or 5
                         G.FUNCS.discard_cards_from_highlighted(nil, true)
                     end
-                return true end }))
+                return true end })
                 G.GAME.blind.triggered = true
                 delay(0.7)
             end
