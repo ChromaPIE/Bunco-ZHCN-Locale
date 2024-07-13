@@ -29,7 +29,7 @@
 -- (done) Remove debuff when fluorescent edition is applied to a debuffed card
 -- (done) Make tarot badges use localization
 -- (done) Pawn and linocut fake suit and rank
--- Check eternal food compat
+-- (done) Check eternal food compat
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
@@ -102,13 +102,9 @@ end
 -- Forced messages for evaluation
 
 local function event(config)
-    G.E_MANAGER:add_event(Event({
-        trigger = config.trigger,
-        delay = config.delay,
-        blockable = config.blockable,
-        blocking = config.blocking,
-        func = config.func
-    }))
+    local e = Event(config)
+    G.E_MANAGER:add_event(e)
+    return e
 end
 
 local function big_juice(card)
@@ -584,36 +580,53 @@ create_joker({ -- Dread
                 end
             end
 
-            if context.after and G.GAME.current_round.hands_left == 0 and context.scoring_name then
+            if (context.after or context.first_hand_drawn) and G.GAME.current_round.hands_left == 1 then -- For shaking the card when there's one hand left
+                event({func = function ()
+                    local eval = function() return G.GAME.current_round.hands_left == nil or G.GAME.current_round.hands_left ~= 0 end
+                    juice_card_until(card, eval, true)
+                return true end})
+            end
 
-                level_up_hand(card, context.scoring_name, true, 2)
+            if context.after and G.GAME.current_round.hands_left <= 0 and context.scoring_name then
+                ---- Event (1): display message
+                forced_message(localize('k_level_up_ex'), card, G.C.RED, true)
+                ---- Events (2): animate level up
+                -- line copied from planet use
+                update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(context.scoring_name, 'poker_hands'),chips = G.GAME.hands[context.scoring_name].chips, mult = G.GAME.hands[context.scoring_name].mult, level=G.GAME.hands[context.scoring_name].level})
+                -- Has immediate effects
+                level_up_hand(card, context.scoring_name, false, 2)
+                card.ability.extra.level_up_list[context.scoring_name] =
+                    (card.ability.extra.level_up_list[context.scoring_name] or 0) + 2
+                local trash_list = card.ability.extra.trash_list
+                ---- Event (3): start_dissolve() on every card to trash
+                -- start_dissolve() calls run concurrently with blocking events.
+                -- To treat them as a normal event, wrap them in a
+                -- 'before' event with delay equal to how long start_dissolve() takes
 
-                if card.ability.extra.level_up_list[context.scoring_name] then
-                    card.ability.extra.level_up_list[context.scoring_name] = card.ability.extra.level_up_list[context.scoring_name] + 2
-                else
-                    card.ability.extra.level_up_list[context.scoring_name] = 2
-                end
-
+                -- (From Firch) UPD: Trying to make this work with other Dread copies a bit better,
+                -- added an additional check if the cards are already destroyed.
+                -- Without this check a second Dread would cause a destroying sound to play
+                -- despite not having any cards to destroy
+                local dissolve_time_fac = 3
                 event({
-                    trigger = 'after',
+                    trigger = 'before',
+                    delay = 0.7*dissolve_time_fac*1.051,
                     func = function()
-
-                        for i = 1, #card.ability.extra.trash_list do
-
-                            if card.ability.extra.trash_list[i].area.config.type == 'play' then
-                                card.ability.extra.trash_list[i]:start_dissolve(nil, nil, 3)
-                                card.ability.extra.trash_list[i].destroyed = true
+                        big_juice(card)
+                        for _, card_to_trash in ipairs(trash_list) do
+                            if not card_to_trash.removed then
+                                card_to_trash:start_dissolve(nil, nil, dissolve_time_fac)
                             end
-
                         end
-                        card.ability.extra.trash_list = {}
-
-                return true end })
-
-                return {
-                    colour = G.C.RED,
-                    message = localize('k_level_up_ex')
-                }
+                        return true
+                    end
+                })
+                update_hand_text({delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+                -- Has immediate effects, so make sure this is set for other mods
+                for _, card_to_trash in ipairs(trash_list) do
+                    card_to_trash.destroyed = true
+                end
+                card.ability.extra.trash_list = {}
             end
         end
     end,
@@ -1037,34 +1050,35 @@ create_joker({ -- Fingerprints
 
 create_joker({ -- Zero Shapiro
     name = 'Zero Shapiro', position = 23,
-    vars = {{bonus = 0.3}, {amount = 0}},
+    vars = {{bonus = 0.3}, {amount = 1}},
     rarity = 'Uncommon', cost = 4,
-    blueprint = true, eternal = true,
+    blueprint = false, eternal = true,
     unlocked = true,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
-            if context.other_card.config.center == G.P_CENTERS.m_stone or context.other_card:get_id() == 0 or not tonumber(context.other_card.base.value) and context.other_card.base.value ~= 'Ace' then
+            if context.other_card.config.center.key == 'm_stone' or context.other_card:get_id() == 0 or not tonumber(context.other_card.base.value) and context.other_card.base.value ~= 'Ace' then
 
+                local old_amount = card.ability.extra.amount
                 card.ability.extra.amount = card.ability.extra.amount + card.ability.extra.bonus
 
                 for k, v in pairs(G.GAME.probabilities) do
-                    G.GAME.probabilities[k] = v + card.ability.extra.bonus
+                    G.GAME.probabilities[k] = G.GAME.probabilities[k] / old_amount * card.ability.extra.amount
                 end
 
                 return {
-                    extra = {focus = context.other_card, message = '+'..card.ability.extra.bonus..' '..loc.dictionary.chance, colour = G.C.GREEN},
+                    extra = {message = '+X'..card.ability.extra.bonus..' '..loc.dictionary.chance, colour = G.C.GREEN},
                     card = card
                 }
             end
         end
 
         if context.end_of_round and not context.other_card then
-            if card.ability.extra.amount ~= 0 then
+            if card.ability.extra.amount ~= 1 then
                 for k, v in pairs(G.GAME.probabilities) do
-                    G.GAME.probabilities[k] = v - (card.ability.extra.amount)
+                    G.GAME.probabilities[k] = v / card.ability.extra.amount
                 end
 
-                card.ability.extra.amount = 0
+                card.ability.extra.amount = 1
 
                 forced_message(localize('k_reset'), card, G.C.GREEN, true)
             end
@@ -1072,10 +1086,10 @@ create_joker({ -- Zero Shapiro
 
         if context.selling_self then
             for k, v in pairs(G.GAME.probabilities) do
-                G.GAME.probabilities[k] = v - (card.ability.extra.amount)
+                G.GAME.probabilities[k] = v / card.ability.extra.amount
             end
 
-            card.ability.extra.amount = 0
+            card.ability.extra.amount = 1
         end
     end
 })
@@ -1709,6 +1723,51 @@ create_joker({ -- Puzzle Board
                     big_juice(card)
                     cards[math.random(#cards)]:set_edition(edition, true)
                 end
+            end
+        end
+    end
+})
+
+create_joker({ -- Vandalism
+    name = 'Vandalism', position = 42, soul = coordinate(42),
+    vars = {{odds = 4}, {xmult = 2}, {card_list = {}}},
+    custom_vars = function(self, info_queue, card)
+        local vars
+        if G.GAME and G.GAME.probabilities.normal then
+            vars = {G.GAME.probabilities.normal, card.ability.extra.odds, card.ability.extra.xmult}
+        else
+            vars = {1, card.ability.extra.odds, card.ability.extra.xmult}
+        end
+        return {vars = vars}
+    end,
+    rarity = 'Rare', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.stay_flipped and not context.blueprint then
+            big_juice(card)
+        end
+        if context.play_cards then
+            card.ability.extra.card_list = {}
+            for i = 1, #G.hand.highlighted do
+                if G.hand.highlighted[i].facing == 'back' then
+                    table.insert(card.ability.extra.card_list, G.hand.highlighted[i])
+                end
+            end
+        end
+        if context.individual and context.cardarea == G.play and context.other_card then
+            local condition = false
+            for i = 1, #card.ability.extra.card_list do
+                local flipped_card = card.ability.extra.card_list[i]
+                if context.other_card == flipped_card then
+                    condition = true
+                    break
+                end
+            end
+            if condition then return {
+                x_mult = card.ability.extra.xmult,
+                card = card
+            }
             end
         end
     end
@@ -2582,7 +2641,7 @@ SMODS.Blind{ -- The Tine
     end,
 
     debuff_card = function(self, card, from_blind)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
+        if not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.base.value == G.GAME.current_round.most_played_rank then
                 card:set_debuff(true)
                 return true
@@ -2658,7 +2717,7 @@ SMODS.Blind{ -- The Flame
     boss = {min = 3},
 
     debuff_card = function(self, card, from_blind)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
+        if not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.config.center ~= G.P_CENTERS.c_base then
                 card:set_debuff(true)
                 return true
@@ -2687,7 +2746,7 @@ SMODS.Blind{ -- The Mask
     end,
 
     modify_hand = function(self, cards, poker_hands, text, mult, hand_chips)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
+        if not G.GAME.blind.disabled then
             if G.GAME.last_hand_played == G.GAME.current_round.most_played_poker_hand then
                 G.GAME.blind.triggered = true
                 return G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_mult, G.GAME.hands[G.GAME.current_round.least_played_poker_hand].s_chips, true
@@ -2716,7 +2775,7 @@ SMODS.Blind{ -- The Bulwark
     end,
 
     press_play = function(self)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
+        if not G.GAME.blind.disabled then
             if G.FUNCS.get_poker_hand_info(G.hand.highlighted) == G.GAME.current_round.most_played_poker_hand then
                 local original_limit = G.hand.config.highlighted_limit
                 event({ func = function()
@@ -2749,7 +2808,7 @@ SMODS.Blind{ -- The Knoll
     boss = {min = 4},
 
     stay_flipped = function(self, area, card)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers and
+        if not G.GAME.blind.disabled and card.area ~= G.jokers and
         G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0 then
             if G.GAME.dollars > 5 then
                 card:set_debuff(true)
@@ -2770,7 +2829,7 @@ SMODS.Blind{ -- The Stone
     boss_colour = HEX('586372'),
 
     set_blind = function(self, reset, silent)
-        if not reset and G.GAME.blind.debuff and not G.GAME.blind.disabled and G.GAME.dollars >= 10 then
+        if not reset and not G.GAME.blind.disabled and G.GAME.dollars >= 10 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (math.floor(G.GAME.dollars / 10) + G.GAME.blind.mult)
             local chip_mod -- iterate over ~120 ticks
             if type(G.GAME.blind.chips) ~= 'table' then
@@ -2808,7 +2867,7 @@ SMODS.Blind{ -- The Sand
     boss_colour = HEX('b79131'),
 
     set_blind = function(self, reset, silent)
-        if not reset and G.GAME.blind.debuff and not G.GAME.blind.disabled and #G.HUD_tags ~= 0 then
+        if not reset and not G.GAME.blind.disabled and #G.HUD_tags ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (#G.HUD_tags + G.GAME.blind.mult)
             local chip_mod -- iterate over ~120 ticks
             if type(G.GAME.blind.chips) ~= 'table' then
@@ -2903,7 +2962,7 @@ SMODS.Blind{ -- The Cadaver
     boss = {min = 2},
 
     debuff_hand = function(self, cards, hand, handname, check)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled then
+        if not G.GAME.blind.disabled then
             for i = 1, #cards do
                 if cards[i]:is_face() then
                     return true
@@ -2926,7 +2985,7 @@ SMODS.Blind{ -- Chartreuse Crown
     boss = {showdown = true, min = 10, max = 10},
 
     debuff_card = function(self, card, from_blind)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
+        if not G.GAME.blind.disabled and card.area ~= G.jokers then
             if card.base.suit == ('Spades') or
             card.base.suit == ('Hearts') or
             card.base.suit == ('Clubs') or
@@ -2985,7 +3044,7 @@ SMODS.Blind{ -- Indigo Tower
     boss = {showdown = true, min = 10, max = 10},
 
     debuff_card = function(self, card, from_blind)
-        if G.GAME.blind.debuff and not G.GAME.blind.disabled and card.area ~= G.jokers then
+        if not G.GAME.blind.disabled and card.area ~= G.jokers then
             if not card.ability.played_this_ante then
                 card:set_debuff(true)
                 return true
@@ -3015,7 +3074,7 @@ SMODS.Blind{ -- Turquoise Shield
     boss = {showdown = true, min = 10, max = 10},
 
     set_blind = function(self, reset, silent)
-        if not reset and G.GAME.blind.debuff and not G.GAME.blind.disabled and G.GAME.overscore ~= 0 then
+        if not reset and not G.GAME.blind.disabled and G.GAME.overscore ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) + (G.GAME.overscore or 0)
             local chip_mod -- iterate over ~120 ticks
             if type(G.GAME.blind.chips) ~= 'table' then
