@@ -641,6 +641,15 @@ return {
                 [3] = 'a {C:green}#2# in #3#{} chance to',
                 [4] = 'play selected cards'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '走火',
+            ['text'] = {
+                [1] = '{X:mult,C:white}X#1#{}倍率',
+                [2] = '{C:attention}选定{}卡牌时',
+                [3] = '有{C:green}#2#/#3#{}的几率',
+                [4] = '直接触发出牌'
+            }
         }
     },
     hopscotch = {
@@ -650,6 +659,13 @@ return {
                 [1] = 'Gain {C:red}+#1#{} discard',
                 [2] = 'if played hand',
                 [3] = 'contains a {C:attention}Straight{}'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '跳房子',
+            ['text'] = {
+                [1] = '若出牌牌型为{C:attention}顺子',
+                [2] = '弃牌次数{C:red}+#1#'
             }
         }
     },
@@ -866,7 +882,7 @@ return {
             ['name'] = '伞',
             ['text'] = {
                 [1] = '出牌后，将所有',
-                [2] = '正面朝上的卡牌翻面'
+                [2] = '卡牌翻至背面'
             }
         }
     },
@@ -995,16 +1011,16 @@ return {
         ['zh_CN'] = {
             ['name'] = '帷幕',
             ['text'] = {
-                [1] = '选中正面朝上的卡牌时',
-                [2] = '将其翻面'
+                [1] = '选中卡牌时',
+                [2] = '将其翻至背面'
             }
         }
     },
     cadaver = {
         ['en-us'] = {
-            ['name'] = 'The Cadaver',
+            ['name'] = '尸骸',
             ['text'] = {
-                [1] = 'Must not play face cards'
+                [1] = '不允许打出人头牌'
             }
         }
     },
@@ -1184,7 +1200,8 @@ return {
         ['zh_CN'] = {
             ['name'] = '金缕标签',
             ['text'] = {
-                [1] = '标准包仅包含{C:bunco_exotic}异域{}牌'
+                [1] = '下一个打开的标准包',
+                [2] = '将仅包含{C:bunco_exotic}异域{}牌'
             }
         }
     },
