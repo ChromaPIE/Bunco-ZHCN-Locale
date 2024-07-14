@@ -99,6 +99,10 @@ local function coordinate(position)
     return get_coordinates(position - 1)
 end
 
+-- math.huge replacement
+
+local huge_number = 9999
+
 -- Forced messages for evaluation
 
 local function event(config)
@@ -109,6 +113,10 @@ end
 
 local function big_juice(card)
     card:juice_up(0.7)
+end
+
+local function extra_juice(card)
+    card:juice_up(0.6, 0.1)
 end
 
 local function forced_message(message, card, color, delay, juice)
@@ -964,7 +972,7 @@ create_joker({ -- Fiendish
 
 create_joker({ -- Carnival
     name = 'Carnival', position = 19,
-    vars = {{ante = -math.huge}},
+    vars = {{ante = -huge_number}},
     rarity = 'Rare', cost = 10,
     blueprint = false, eternal = true,
     unlocked = true,
@@ -1043,7 +1051,7 @@ create_joker({ -- Fingerprints
             -- not needed, but good style to fail fast
             card.ability.extra.scoring_card_set = nil
 
-            forced_message(localize('k_upgrade_ex'), card, G.C.CHIPS)
+            forced_message(localize('k_upgrade_ex'), card, G.C.CHIPS, true)
         end
     end
 })
@@ -1601,9 +1609,18 @@ create_joker({ -- Trigger Finger
     blueprint = true, eternal = true,
     unlocked = true,
     calculate = function(self, card, context)
-        if context.select_card then
+        if context.highlight_card and (G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND) then
+            local cards = {}
+            for i = 1, #G.hand.highlighted do
+                table.insert(cards, G.hand.highlighted[i])
+            end
             event({trigger = 'after', func = function()
-                if #G.hand.highlighted[1] then
+                for i = 1, #cards do
+                    if not cards[i].highlighted then
+                        cards[i]:highlight()
+                    end
+                end
+                if G.hand.highlighted then
                     forced_message(loc.dictionary.pew, card, G.C.RED)
                     G.FUNCS.play_cards_from_highlighted()
                 end
@@ -1768,6 +1785,49 @@ create_joker({ -- Vandalism
                 x_mult = card.ability.extra.xmult,
                 card = card
             }
+            end
+        end
+    end
+})
+
+create_joker({ -- Cellphone
+    name = 'Cellphone', position = 43,
+    vars = {{chip_mult = 8}, {chips = 0}, {rank = -huge_number}},
+    rarity = 'Common', cost = 4,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.pre_discard then
+            local raised_card = nil
+            for i = 1, #G.hand.highlighted do
+                if not card.debuff and card.ability.extra.rank < G.hand.highlighted[i].base.nominal and G.hand.cards[i].ability.effect ~= 'Stone Card' then
+                    card.ability.extra.chips = G.hand.highlighted[i].base.nominal * card.ability.extra.chip_mult
+                    card.ability.extra.rank = G.hand.highlighted[i].base.nominal
+                    raised_card = G.hand.highlighted[i]
+                end
+            end
+            if raised_card then
+                event({delay = 0.7 * 1.25, trigger = 'before', func = function()
+                    play_sound('generic1', nil, 1)
+                    extra_juice(card)
+                    big_juice(raised_card)
+                return true end})
+            end
+        end
+        if context.joker_main then
+            if card.ability.extra.chips ~= 0 then
+                return {
+                    message = localize{type = 'variable', key = 'a_chips', vars = {card.ability.extra.chips}},
+                    chip_mod = card.ability.extra.chips,
+                }
+            end
+        end
+        if context.end_of_round then
+            if card.ability.extra.rank ~= -huge_number then
+                card.ability.extra.rank = -huge_number
+                card.ability.extra.chips = 0
+
+                forced_message(localize('k_reset'), card, G.C.RED, true)
             end
         end
     end

@@ -704,6 +704,16 @@ return {
             }
         }
     },
+    cellphone = {
+        ['en-us'] = {
+            ['name'] = 'Cellphone',
+            ['text'] = {
+                [1] = 'Adds {C:attention}#1#X{} the highest rank',
+                [2] = 'discarded this round to Chips',
+                [3] = '{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)'
+            }
+        }
+    },
 
     -- Exotic
 
@@ -858,8 +868,8 @@ return {
         ['en-us'] = {
             ['name'] = 'The Paling',
             ['text'] = {
-                [1] = 'Playing or discarding costs',
-                [2] = 'both play and discard'
+                [1] = 'Playing or Discarding costs',
+                [2] = 'both hand and discard'
             }
         },
         ['zh_CN'] = {
