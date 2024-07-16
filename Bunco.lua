@@ -30,6 +30,9 @@
 -- (done) Make tarot badges use localization
 -- (done) Pawn and linocut fake suit and rank
 -- (done) Check eternal food compat
+-- Reset metallurgist-like bonuses when you lose
+-- Fix the mask giving spectrum hands when they're invisible
+-- Make so enhancement-related Jokers do not appear unless player has respective enhancements
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
@@ -1487,13 +1490,21 @@ create_joker({ -- Metallurgist
     rarity = 'Common', cost = 6,
     blueprint = false, eternal = true,
     unlocked = true,
-    update = function(self, card)
-        if card.area == G.jokers and not card.debuff then
-            G.P_CENTERS.m_gold.config.h_mult = card.ability.extra.mult
+    add = function(self, card)
+        for _, deck_card in pairs(G.playing_cards) do
+            if deck_card.config.center == G.P_CENTERS.m_gold then
+                deck_card.ability.h_mult = (deck_card.ability.h_mult or 0) + card.ability.extra.mult
+            end
         end
+        G.P_CENTERS.m_gold.config.h_mult = (G.P_CENTERS.m_gold.config.h_mult or 0) + card.ability.extra.mult
     end,
     remove = function(self, card)
-        G.P_CENTERS.m_gold.config.h_x_mult = 0
+        for _, deck_card in pairs(G.playing_cards) do
+            if deck_card.config.center == G.P_CENTERS.m_gold then
+                deck_card.ability.h_mult = deck_card.ability.h_mult - card.ability.extra.mult
+            end
+        end
+        G.P_CENTERS.m_gold.config.h_mult = G.P_CENTERS.m_gold.config.h_mult - card.ability.extra.mult
     end
 })
 
@@ -1829,6 +1840,42 @@ create_joker({ -- Cellphone
 
                 forced_message(localize('k_reset'), card, G.C.RED, true)
             end
+        end
+    end
+})
+
+create_joker({ -- Doodle
+    name = 'Doodle', position = 44,
+    vars = {{active = true}},
+    rarity = 'Rare', cost = 10,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.end_of_round then
+            if not card.ability.extra.active then
+                card.ability.extra.active = true
+                local eval = function() return card.ability.extra.active end
+                juice_card_until(card, eval, true)
+            end
+        end
+        if context.using_consumeable and card.ability.extra.active then
+            event({func = function ()
+                if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+                    forced_message(localize('k_duplicated_ex'), context.blueprint_card or card, nil, true, copy)
+                    local copy
+                    card.ability.extra.active = false
+                    copy = copy_card(context.consumeable)
+                    copy:add_to_deck()
+                    G.consumeables:emplace(copy)
+                end
+                return true
+            end})
+        end
+    end,
+    add = function(self, card)
+        if card.ability.extra.active then
+            local eval = function() return card.ability.extra.active end
+            juice_card_until(card, eval, true)
         end
     end
 })
@@ -2681,6 +2728,17 @@ SMODS.Blind{ -- The Umbrella
     key = 'umbrella', loc_txt = loc.umbrella,
     boss = {min = 2},
 
+    disable = function(self)
+        for i = 1, #G.hand.cards do
+            if G.hand.cards[i].facing == 'back' then
+                G.hand.cards[i]:flip()
+            end
+        end
+        for k, v in pairs(G.playing_cards) do
+            v.ability.wheel_flipped = nil
+        end
+    end,
+
     boss_colour = HEX('1e408e'),
 
     pos = {y = 1},
@@ -2729,6 +2787,17 @@ SMODS.Blind{ -- The Swing
             return true
         else
             return false
+        end
+    end,
+
+    disable = function(self)
+        for i = 1, #G.hand.cards do
+            if G.hand.cards[i].facing == 'back' then
+                G.hand.cards[i]:flip()
+            end
+        end
+        for k, v in pairs(G.playing_cards) do
+            v.ability.wheel_flipped = nil
         end
     end,
 
@@ -2886,9 +2955,10 @@ SMODS.Blind{ -- The Stone
     key = 'stone', loc_txt = loc.stone,
     boss = {min = 4},
 
-    boss_colour = HEX('586372'),
-
     set_blind = function(self, reset, silent)
+        if not reset then
+            G.GAME.blind.original_chips = G.GAME.blind.chips
+        end
         if not reset and not G.GAME.blind.disabled and G.GAME.dollars >= 10 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (math.floor(G.GAME.dollars / 10) + G.GAME.blind.mult)
             local chip_mod -- iterate over ~120 ticks
@@ -2916,6 +2986,13 @@ SMODS.Blind{ -- The Stone
         end
     end,
 
+    disable = function()
+        G.GAME.blind.chips = G.GAME.blind.original_chips
+        G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+    end,
+
+    boss_colour = HEX('586372'),
+
     pos = {y = 10},
     atlas = 'bunco_blinds'
 }
@@ -2924,9 +3001,10 @@ SMODS.Blind{ -- The Sand
     key = 'sand', loc_txt = loc.sand,
     boss = {min = 4},
 
-    boss_colour = HEX('b79131'),
-
     set_blind = function(self, reset, silent)
+        if not reset then
+            G.GAME.blind.original_chips = G.GAME.blind.chips
+        end
         if not reset and not G.GAME.blind.disabled and #G.HUD_tags ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) * (#G.HUD_tags + G.GAME.blind.mult)
             local chip_mod -- iterate over ~120 ticks
@@ -2954,6 +3032,11 @@ SMODS.Blind{ -- The Sand
         end
     end,
 
+    disable = function()
+        G.GAME.blind.chips = G.GAME.blind.original_chips
+        G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+    end,
+
     in_pool = function()
         if G.GAME.round_resets.ante < 4 or (G.HUD_tags and #G.HUD_tags < 2) then
             return false
@@ -2961,6 +3044,8 @@ SMODS.Blind{ -- The Sand
             return true
         end
     end,
+
+    boss_colour = HEX('b79131'),
 
     pos = {y = 11},
     atlas = 'bunco_blinds'
@@ -3134,7 +3219,10 @@ SMODS.Blind{ -- Turquoise Shield
     boss = {showdown = true, min = 10, max = 10},
 
     set_blind = function(self, reset, silent)
-        if not reset and not G.GAME.blind.disabled and G.GAME.overscore ~= 0 then
+        if not reset then
+            G.GAME.blind.original_chips = G.GAME.blind.chips
+        end
+        if not reset and not G.GAME.blind.disabled and G.GAME.overscore and G.GAME.overscore ~= 0 then
             local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) + (G.GAME.overscore or 0)
             local chip_mod -- iterate over ~120 ticks
             if type(G.GAME.blind.chips) ~= 'table' then
@@ -3159,6 +3247,11 @@ SMODS.Blind{ -- Turquoise Shield
                 end
             end})
         end
+    end,
+
+    disable = function()
+        G.GAME.blind.chips = G.GAME.blind.original_chips
+        G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
     end,
 
     defeat = function(self)
