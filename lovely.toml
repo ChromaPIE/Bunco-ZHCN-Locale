@@ -17,6 +17,7 @@ or text == 'h_bunc_Straight Spectrum'
 or text == 'h_bunc_Spectrum House'
 or text == 'h_bunc_Spectrum Five' then
     enable_exotics()
+    unlock_card(G.P_CENTERS.b_bunc_fairy)
 end
 
 '''
@@ -220,8 +221,8 @@ pattern = "if main_end then"
 position = "before"
 match_indent = true
 payload = """
-if (_c.set == 'Default' or _c.set == 'Enhanced') and card and card.ability and card.ability.extra and type(card.ability.extra) == 'table' and card.ability.extra.temporary_extra_chips and not card.debuff then
-    localize{type = 'other', key = 'temporary_extra_chips', nodes = desc_nodes, vars = {card.ability.extra.temporary_extra_chips}}
+if (_c.set == 'Default' or _c.set == 'Enhanced') and card and card.ability and type(card.ability) == 'table' and card.ability.temporary_extra_chips and not card.debuff then
+    localize{type = 'other', key = 'temporary_extra_chips', nodes = desc_nodes, vars = {card.ability.temporary_extra_chips}}
 end"""
 
 # function CardArea:emplace() (X-Ray)
@@ -529,11 +530,26 @@ end
 
 '''
 
-# function Card:draw (Vandalism 2/7)
+# function Card:draw (Vandalism 2/7 - Vanilla)
 [[patches]]
 [patches.pattern]
 target = 'card.lua'
 pattern = '''if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then'''
+position = 'before'
+match_indent = true
+payload = '''
+
+if self.ability.name == 'Vandalism' and (self.config.center.discovered or self.bypass_discovery_center) then
+    self.children.floating_sprite:draw_shader('dissolve', nil, nil, nil, self.children.center, 0, 0)
+end
+
+'''
+
+# function Card:draw (Vandalism 2/7 - Cryptid Compat)
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if (self.edition and (self.edition.negative or self.edition.cry_oversat)) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then'''
 position = 'before'
 match_indent = true
 payload = '''
@@ -1025,6 +1041,8 @@ if G.GAME.blind and G.GAME.blind.name == 'bl_bunc_blade' and not G.GAME.blind.di
 
     local overscore = get_blind_amount(G.GAME.round_resets.ante)*G.GAME.blind.mult*G.GAME.starting_params.ante_scaling
     overscore = overscore * 1.5
+
+    if type(hand_chips) == 'table' then overscore = to_big(overscore) end
 
     if G.GAME.Blade and not G.GAME.Blade.disabled and (overscore < math.floor(hand_chips*mult)) then
 
