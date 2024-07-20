@@ -31,8 +31,9 @@
 -- (done) Pawn and linocut fake suit and rank
 -- (done) Check eternal food compat
 -- Reset metallurgist-like bonuses when you lose
--- Fix the mask giving spectrum hands when they're invisible
+-- (done) Fix the mask giving spectrum hands when they're invisible
 -- Make so enhancement-related Jokers do not appear unless player has respective enhancements
+-- (done) Custom description for the Disproportionality that isn't just Misprint 2
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
@@ -736,6 +737,18 @@ create_joker({ -- Ghost Print
 create_joker({ -- Loan Shark
     name = 'Loan Shark', position = 11,
     vars = {{dollars = 50}, {cost = -100}},
+    process_loc_text = function(self)
+        SMODS.Joker.process_loc_text(self)
+        SMODS.process_loc_text(G.localization.descriptions.Joker, self.key..'_additional', loc.loan_shark_full)
+    end,
+    custom_vars = function(self, info_queue, card)
+        local vars = {card.ability.extra.dollars, card.ability.extra.cost}
+        if card.area and card.area.config.collection then
+            return {key = self.key..'_additional', vars = vars}
+        else
+            return {vars = vars}
+        end
+    end,
     rarity = 'Uncommon', cost = 3,
     blueprint = false, eternal = true,
     unlocked = false,
@@ -748,7 +761,6 @@ create_joker({ -- Loan Shark
     end,
     add = function(self, card)
         ease_dollars(card.ability.extra.dollars)
-        card.ability.extra_value = card.ability.extra.cost - card.sell_cost
         card:set_cost()
     end
 })
@@ -894,6 +906,7 @@ create_joker({ -- Dogs Playing Poker
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
     unlocked = true,
+    purist = false,
     calculate = function(self, card, context)
         if context.joker_main then
 
@@ -1801,8 +1814,8 @@ create_joker({ -- Vandalism
     end
 })
 
-create_joker({ -- Cellphone
-    name = 'Cellphone', position = 43,
+create_joker({ -- Protester
+    name = 'Protester', position = 43,
     vars = {{chip_mult = 8}, {chips = 0}, {rank = -huge_number}},
     rarity = 'Common', cost = 4,
     blueprint = true, eternal = true,
@@ -1880,6 +1893,158 @@ create_joker({ -- Doodle
     end
 })
 
+create_joker({ -- Disproportionality
+    name = 'Disproportionality', position = 45,
+    vars = {{min = 0}, {max = 200}},
+    custom_vars = function(self, info_queue, card)  
+        local r_chips = {}
+        for i = card.ability.extra.min, card.ability.extra.max do
+            r_chips[#r_chips + 1] = string.format("%03d", i)
+        end
+        local loc_chips = ' '..(loc.dictionary.chips)..' '
+        local text = {
+            [1] = "[1] Lua local 'handler'",
+            [2] = "at file 'chip_mod.lua:",
+            [3] = "'",
+            [4] = "ERROR",
+            [5] = "Stack Traceback"
+        }
+        --for i = 1, #r_chips do
+        --    r_chips[i] = text[2]..r_chips[i]..text[3]
+        --end
+        return {main_start =
+        {{n = G.UIT.R, config = {align = "cm"}, nodes = {
+            {n = G.UIT.R, config = {align = "cm", padding = 0.02}, nodes = {
+                {n = G.UIT.O, config = {object = DynaText({string = {
+                    {string = text[1]}, {string = text[1]}, {string = text[1]}, {string = text[1]}, {string = text[1]}, {string = text[1]},
+                    {string = text[4], colour = G.C.JOKER_GREY},
+                    {string = text[5]},
+                }, colours = {G.C.L_BLACK}, random_element = true, pop_in_rate = 9999999, silent = true, pop_delay = 0.2, scale = 0.32, min_cycle_time = 0})}},
+            }},
+            {n = G.UIT.R, config = {align = "cm", padding = 0.02}, nodes = {
+                {n = G.UIT.T, config = {text = text[2], colour = G.C.L_BLACK, scale = 0.32}},
+                {n = G.UIT.O, config = {object = DynaText({string = r_chips, colours = {G.C.CHIPS}, pop_in_rate = 9999999, silent = true, pop_delay = 0.005, scale = 0.32, min_cycle_time = 0})}},
+                {n = G.UIT.T, config = {text = text[3], colour = G.C.L_BLACK, scale = 0.32}}
+            }}
+        }}}
+        }
+    end,
+    rarity = 'Common', cost = 4,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local temp_chips = pseudorandom('disproportionality', card.ability.extra.min, card.ability.extra.max)
+            return {
+                message = localize{type='variable',key='a_chips',vars={temp_chips}},
+                chip_mod = temp_chips
+            }
+        end
+    end
+})
+
+create_joker({ -- Running Joke
+    name = 'Running Joke', position = 46,
+    custom_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.e_negative
+        info_queue[#info_queue+1] = {set = 'Joker', key = 'j_joker', specific_vars = {G.P_CENTERS['j_joker'].config.mult}}
+    end,
+    rarity = 'Rare', cost = 8,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.enter_shop then
+            big_juice(card)
+            local card = create_card('Joker', G.shop_jokers, false, nil, nil, nil, 'j_joker')
+            card:set_edition({negative = true})
+            create_shop_card_ui(card)
+            card:add_to_deck()
+            G.shop_jokers:emplace(card)
+        end
+    end
+})
+
+create_joker({ -- On Broadway
+    name = 'On Broadway', position = 47,
+    vars = {{chips = 120}, {mult = 20}},
+    rarity = 'Uncommon', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.joker_main and context.scoring_hand and context.poker_hands ~= nil and next(context.poker_hands['Straight']) then
+            local face = false
+            for i = 1, #context.scoring_hand do
+                if context.scoring_hand[i]:is_face() then
+                    face = true
+                end
+            end
+            if face then
+                hand_chips = mod_chips(hand_chips + card.ability.extra.chips)
+                update_hand_text({delay = 0}, {chips = hand_chips})
+                forced_message('+'..tostring(card.ability.extra.chips), card, G.C.CHIPS, true)
+                return {
+                    message = localize {
+                        type = 'variable',
+                        key = 'a_mult',
+                        vars = { card.ability.extra.mult }
+                    },
+                    mult_mod = card.ability.extra.mult,
+                    card = card
+                }
+            end
+        end
+    end
+})
+
+create_joker({ -- Rasta
+    name = 'Rasta', position = 48,
+    vars = {{mult = 20}},
+    rarity = 'Common', cost = 5,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local enhancement = false
+            for i = 1, #context.scoring_hand do
+                if context.scoring_hand[i].config.center ~= G.P_CENTERS.c_base then
+                    enhancement = true
+                end
+            end
+            if not enhancement then return {
+                message = localize {
+                    type = 'variable',
+                    key = 'a_mult',
+                    vars = { card.ability.extra.mult }
+                },
+                mult_mod = card.ability.extra.mult,
+                card = card
+            } end
+        end
+    end
+})
+
+create_joker({ -- Critic
+    name = 'Critic', position = 49,
+    vars = {{xmult = 2}, {fraction = 5}},
+    rarity = 'Common', cost = 6,
+    blueprint = true, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local temp_chips = G.GAME.blind.chips
+            if math.floor(hand_chips * mult) < (temp_chips / card.ability.extra.fraction) then return {
+                Xmult_mod = card.ability.extra.xmult,
+                card = card,
+                message = localize {
+                    type = 'variable',
+                    key = 'a_xmult',
+                    vars = { card.ability.extra.xmult }
+                },
+            } end
+        end
+    end
+})
+
 -- Exotic Jokers
 
 create_joker({ -- Zealous
@@ -1953,7 +2118,7 @@ create_joker({ -- Wishalloy
 create_joker({ -- Unobtanium
     type = 'Exotic',
     name = 'Unobtanium', position = 6,
-    vars = {{mult = 12}, {chips = 100}},
+    vars = {{chips = 100}, {mult = 12}},
     rarity = 'Uncommon', cost = 7,
     blueprint = true, eternal = true,
     unlocked = true,
@@ -3067,15 +3232,6 @@ SMODS.Blind{ -- The Blade
         self.vars = {loc.dictionary.blade}
     end,
 
-    press_play = function()
-        if not G.GAME.Blade then G.GAME.Blade = {} end
-        G.GAME.Blade.chips = G.GAME.chips
-    end,
-
-    defeat = function()
-        G.GAME.Blade = nil
-    end,
-
     boss_colour = HEX('d92034'),
 
     pos = {y = 12},
@@ -3109,7 +3265,7 @@ SMODS.Blind{ -- The Cadaver
     debuff_hand = function(self, cards, hand, handname, check)
         if not G.GAME.blind.disabled then
             for i = 1, #cards do
-                if cards[i]:is_face() then
+                if cards[i]:is_face() and (cards[i].facing == 'front' or not check) then
                     return true
                 end
             end

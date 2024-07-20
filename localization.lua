@@ -249,7 +249,7 @@ return {
         ['en-us'] = {
             ['name'] = 'Crop Circles',
             ['text'] = {
-                [1] = '{C:clubs}Clubs{} give {C:mult}+3{} Mult,',
+                [1] = 'Base suit {C:clubs}Clubs{} give {C:mult}+3{} Mult,',
                 [2] = '{C:attention}8s{} give {C:mult}+2{} Mult,',
                 [3] = '{C:attention}Qs{}, {C:attention}10s{}, {C:attention}9s{}, {C:attention}6s{} give {C:mult}+1{} Mult'
             }
@@ -259,8 +259,8 @@ return {
         ['en-us'] = {
             ['name'] = 'Crop Circles',
             ['text'] = {
-                [1] = '{C:bunc_fleurons}Fleurons{} give {C:mult}+4{} Mult,',
-                [2] = '{C:clubs}Clubs{} give {C:mult}+3{} Mult,',
+                [1] = 'Base suit {C:bunc_fleurons}Fleurons{} give {C:mult}+4{} Mult,',
+                [2] = 'Base suit {C:clubs}Clubs{} give {C:mult}+3{} Mult,',
                 [3] = '{C:attention}8s{} give {C:mult}+2{} Mult,',
                 [4] = '{C:attention}Qs{}, {C:attention}10s{}, {C:attention}9s{}, {C:attention}6s{} give {C:mult}+1{} Mult'
             }
@@ -331,6 +331,16 @@ return {
             ['text'] = {
                 [1] = 'Gain {C:money}$#1#',
                 [2] = 'when acquired...'
+            }
+        }
+    },
+    loan_shark_full = {
+        ['en-us'] = {
+            ['name'] = 'Loan Shark',
+            ['text'] = {
+                [1] = 'Gain {C:money}$#1#{} when acquired,',
+                [2] = '{C:attention}sell value{} of this',
+                [3] = 'Joker sets to {C:attention}$#2#'
             },
             ['unlock'] = {
                 [1] = 'Have less than {E:1,C:attention}$-20',
@@ -704,9 +714,9 @@ return {
             }
         }
     },
-    cellphone = {
+    protester = {
         ['en-us'] = {
-            ['name'] = 'Cellphone',
+            ['name'] = 'Protester',
             ['text'] = {
                 [1] = 'Adds {C:attention}#1#X{} the highest rank',
                 [2] = 'discarded this round to Chips',
@@ -721,6 +731,55 @@ return {
                 [1] = '{C:attention}Copy{} first consumable',
                 [2] = 'used this round',
                 [3] = '{C:inactive}(Must have room)'
+            }
+        }
+    },
+    disproportionality = {
+        ['en-us'] = {
+            ['name'] = 'Disproportionality',
+            ['text'] = {
+                [1] = ''
+            }
+        }
+    },
+    running_joke = {
+        ['en-us'] = {
+            ['name'] = 'Running Joke',
+            ['text'] = {
+                [1] = 'Create a {C:dark_edition}Negative',
+                [2] = '"{C:attention}Joker{}" at the',
+                [3] = 'start of every shop'
+            }
+        }
+    },
+    on_broadway = {
+        ['en-us'] = {
+            ['name'] = 'On Broadway',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips and {C:mult}+#2#{} Mult if',
+                [2] = 'played hand contains a {C:attention}Straight{}',
+                [3] = 'with a scoring {C:attention}face card'
+            }
+        }
+    },
+    rasta = {
+        ['en-us'] = {
+            ['name'] = 'Rasta',
+            ['text'] = {
+                [1] = '{C:mult}+#1#{} Mult if no',
+                [2] = '{C:attention}Enhanced cards{}',
+                [3] = 'are scored'
+            }
+        }
+    },
+    critic = {
+        ['en-us'] = {
+            ['name'] = 'Critic',
+            ['text'] = {
+                [1] = "{X:mult,C:white}X#1#{} Mult if played hand's",
+                [2] = "current score is",
+                [3] = '{C:attention}less than 1/#2#{} of',
+                [4] = "blind's required score"
             }
         }
     },
@@ -784,7 +843,7 @@ return {
             ['text'] = {
                 [1] = 'Played cards with',
                 [2] = '{C:bunc_halberds}Halberd{} suit give',
-                [3] = '{C:chips}+#2#{} Chips and {C:mult}+#1#{} Mult',
+                [3] = '{C:chips}+#1#{} Chips and {C:mult}+#2#{} Mult',
                 [4] = "when scored"
             }
         }
