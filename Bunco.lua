@@ -658,7 +658,9 @@ create_joker({ -- Prehistoric
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             for k, v in pairs(card.ability.extra.card_list) do
-                if (v == context.other_card.base.id .. context.other_card.base.suit) and context.other_card.config.center ~= G.P_CENTERS.m_stone then
+                if (v:get_id() == context.other_card:get_id())
+                and (v:is_suit(context.other_card.base.suit) or context.other_card.config.center == G.P_CENTERS.m_wild)
+                and context.other_card.config.center ~= G.P_CENTERS.m_stone then
                     return {
                         message = localize {
                             type = 'variable',
@@ -673,7 +675,7 @@ create_joker({ -- Prehistoric
 
             if not context.blueprint then
                 if context.other_card.config.center ~= G.P_CENTERS.m_stone then
-                    table.insert(card.ability.extra.card_list, context.other_card.base.id .. context.other_card.base.suit) -- Add the card to the list
+                    table.insert(card.ability.extra.card_list, context.other_card) -- Add the card to the list
                 end
             end
 
@@ -1690,7 +1692,7 @@ create_joker({ -- Pawn
                 local other_card = context.scoring_hand[i]
                 local rank = math.huge
                 for _, deck_card in ipairs(G.playing_cards) do
-                    if deck_card:get_id() < rank then
+                    if deck_card:get_id() < rank and deck_card.config.center ~= G.P_CENTERS.m_stone then
                         rank = deck_card:get_id()
                     end
                 end
@@ -2041,6 +2043,37 @@ create_joker({ -- Critic
                     vars = { card.ability.extra.xmult }
                 },
             } end
+        end
+    end
+})
+
+create_joker({ -- Cellphone
+    name = 'Cellphone', position = 50,
+    vars = {{active = true}, {cards_to_hand = {}}},
+    rarity = 'Uncommon', cost = 6,
+    blueprint = false, eternal = true,
+    unlocked = true,
+    calculate = function(self, card, context)
+        if context.first_hand_drawn then
+            card.ability.extra.active = true
+            local eval = function() return G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0 end
+            juice_card_until(card, eval, true)
+        end
+        if context.joker_main and context.scoring_hand then
+            card.ability.extra.cards_to_hand = context.scoring_hand
+        end
+        if context.press_play and card.ability.extra.active and G.GAME.current_round.hands_played == 0 then
+            forced_message(loc.dictionary.accepted, card, G.C.GREEN)
+        end
+        if context.after and G.GAME.current_round.hands_played == 0 then
+            event({func = function ()
+                card.ability.extra.active = false
+                return true
+            end})
+        end
+        if context.pre_discard and card.ability.extra.active then
+            card.ability.extra.active = false
+            forced_message(loc.dictionary.declined, card, G.C.RED, true)
         end
     end
 })
@@ -3379,7 +3412,7 @@ SMODS.Blind{ -- Turquoise Shield
             G.GAME.blind.original_chips = G.GAME.blind.chips
         end
         if not reset and not G.GAME.blind.disabled and G.GAME.overscore and G.GAME.overscore ~= 0 then
-            local final_chips = (G.GAME.blind.chips / G.GAME.blind.mult) + (G.GAME.overscore or 0)
+            local final_chips = (G.GAME.blind.chips) + (G.GAME.overscore or 0)
             local chip_mod -- iterate over ~120 ticks
             if type(G.GAME.blind.chips) ~= 'table' then
                 chip_mod = math.ceil((final_chips - G.GAME.blind.chips) / 120)
