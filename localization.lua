@@ -11,6 +11,7 @@ return {
             pew = 'Pew!',
             declined = 'Declined...',
             accepted = 'Accepted!',
+            ouch = 'OUCH!',
             mysterious_tarot = 'Tarot?',
             most_played_rank = '(most played rank)',
             least_played_hand = '(least played hand)',
@@ -333,10 +334,6 @@ return {
             ['text'] = {
                 [1] = 'Gain {C:money}$#1#',
                 [2] = 'when acquired...'
-            },
-            ['unlock'] = {
-                [1] = 'Have less than {E:1,C:attention}$-20',
-                [2] = 'during a single run'
             }
         }
     },
@@ -778,7 +775,7 @@ return {
             ['name'] = 'Critic',
             ['text'] = {
                 [1] = "{X:mult,C:white}X#1#{} Mult if played hand's",
-                [2] = "current score is",
+                [2] = 'current score is',
                 [3] = '{C:attention}less than 1/#2#{} of',
                 [4] = "blind's required score"
             }
@@ -791,6 +788,39 @@ return {
                 [1] = '{C:attention}Return{} scored cards to hand',
                 [2] = 'after first play of round',
                 [3] = 'if no discards were used'
+            }
+        }
+    },
+    wino = {
+        ['en-us'] = {
+            ['name'] = 'Wino',
+            ['text'] = {
+                [1] = 'Played cards with',
+                [2] = '{C:hearts}Heart{} and {C:diamonds}Diamond{} suit',
+                [3] = 'give {C:chips}+#1#{} Chips when scored'
+            }
+        }
+    },
+    bounty_hunter = {
+        ['en-us'] = {
+            ['name'] = 'Bounty Hunter',
+            ['text'] = {
+                [1] = '{C:mult}+#1#{} Mult for every {C:money}$',
+                [2] = 'below {C:money}$0'
+            },
+            ['unlock'] = {
+                [1] = 'Have less than {E:1,C:attention}$-20',
+                [2] = 'during a single run'
+            }
+        }
+    },
+    mousetrap = {
+        ['en-us'] = {
+            ['name'] = 'Mousetrap',
+            ['text'] = {
+                [1] = '{C:chips}+#1#{} Chips,',
+                [2] = '{C:green}#2# in #3#{} chance to',
+                [3] = '{C:attention}lose{} one hand instead'
             }
         }
     },
