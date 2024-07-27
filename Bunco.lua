@@ -12,7 +12,7 @@
 -- (done) Polychrome desc on roy g biv
 -- (?) Debuff registration plate level with shader if possible
 -- (done) Nan morgan or make zero shapiro count letter rank cards
--- Unlocks
+-- (done/WIP) Unlocks
 -- Check whats up with joker knight
 -- (done) Add purist config
 -- (skip: waiting for steamodded) Card sizes
@@ -30,8 +30,8 @@
 -- (done) Make tarot badges use localization
 -- (done) Pawn and linocut fake suit and rank
 -- (done) Check eternal food compat
--- Reset metallurgist-like bonuses when you lose
--- Reset metallurgist-like bonuses when Joker is debuffed
+-- (done) Reset metallurgist-like bonuses when you lose
+-- (done) Reset metallurgist-like bonuses when Joker is debuffed
 -- (done) Fix the mask giving spectrum hands when they're invisible
 -- Make so enhancement-related Jokers do not appear unless player has respective enhancements
 -- (done) Custom description for the Disproportionality that isn't just Misprint 2
@@ -332,14 +332,14 @@ function bunco.set_debuff(card)
     -- Gameplan
 
     if my_pos then
-        if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
-        if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].ability.name == 'Gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
+        if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
+        if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
     end
 
     -- Conquest
 
     for i = 1, #G.jokers.cards do
-        if G.jokers.cards[i].ability.name == 'Conquest' then
+        if G.jokers.cards[i].config.center.key == 'j_bunc_conquest' then
             if G.jokers.cards[i].ability.extra.joker ~= 0 and card == G.jokers.cards[i].ability.extra.joker then
                 return true
             end
@@ -2927,7 +2927,7 @@ SMODS.PokerHand{ -- Deal
 
         if G.jokers ~= nil then
             for _, v in ipairs(G.jokers.cards) do
-                if v.ability.name == 'Registration Plate' then
+                if v.config.center.key == 'j_bunc_registration_plate' then
                     table.insert(deals, v.ability.extra.ranks)
                 end
             end
