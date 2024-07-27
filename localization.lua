@@ -73,37 +73,13 @@ return {
             ['name'] = 'Exotic cards',
             ['text'] = {
                 [1] = 'Cards with',
-                [2] = '{C:fleurons}Fleuron{} or {C:halberds}Halberd{} suit'
+                [2] = '{C:bunc_fleurons}Fleuron{} or {C:bunc_halberds}Halberd{} suit'
             }
         },
         ['zh_CN'] = {
             ['name'] = '异域牌',
             ['text'] = {
-                [1] = '花色为{C:fleurons}印花{}或{C:halberds}斧枪{}的牌'
-            }
-        }
-    },
-
-    -- Exotic cards
-
-    exotic_cards = {
-        ['en-us'] = {
-            ['name'] = 'Exotic cards',
-            ['text'] = {
-                [1] = 'Cards with',
-                [2] = '{C:fleurons}Fleuron{} or {C:halberds}Halberd{} suit'
-            }
-        }
-    },
-
-    -- Exotic cards
-
-    exotic_cards = {
-        ['en-us'] = {
-            ['name'] = 'Exotic cards',
-            ['text'] = {
-                [1] = 'Cards with',
-                [2] = '{C:bunc_fleurons}Fleuron{} or {C:bunc_halberds}Halberd{} suit'
+                [1] = '花色为{C:bunc_fleurons}印花{}或{C:bunc_halberds}斧枪{}的牌'
             }
         }
     },
@@ -132,6 +108,14 @@ return {
                 'each with a different suit'
             },
             extra = 'Royal Spectrum',
+        },
+        ['zh_CN'] = {
+            name = '缤彩顺',
+            description = {
+                "点数连续的5张",
+                "花色各不相同的牌"
+            },
+            extra = '皇家缤彩顺',
         }
     },
     spectrum_house = {
