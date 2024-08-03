@@ -125,7 +125,14 @@ return {
                 'A Three of a Kind and a Pair with',
                 'each card having a different suit'
             }
-        }
+        },
+        ['zh_CN'] = {
+            name = '缤彩葫芦',
+            description = {
+                '包含一个三条和一个对子',
+                '且每张牌花色各不相同'
+            }
+        },
     },
     spectrum_five = {
         ['en-us'] = {
@@ -133,6 +140,13 @@ return {
             description = {
                 '5 cards with the same rank,',
                 'each with a different suit'
+            },
+        },
+        ['zh_CN'] = {
+            name = '缤彩五条',
+            description = {
+                '点数相同的5张',
+                '花色各不相同的牌'
             },
         }
     },
@@ -156,6 +170,14 @@ return {
                 [2] = '{C:attention}#1#{} selected cards',
                 [3] = 'to {C:bunc_fleurons}Fleurons{}',
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '苍穹',
+            ['text'] = {
+                [1] = '将最多{C:attention}#1#{}张',
+                [2] = '选定卡牌',
+                [3] = '转换为{C:bunc_fleurons}印花',
+            }
         }
     },
     abyss = {
@@ -165,28 +187,48 @@ return {
                 [1] = 'Converts up to',
                 [2] = '{C:attention}#1#{} selected cards',
                 [3] = 'to {C:bunc_halberds}Halberds{}',
+            },
+            ['zh_CN'] = {
+                ['name'] = '深渊',
+                ['text'] = {
+                    [1] = '将最多{C:attention}#1#{}张',
+                    [2] = '选定卡牌',
+                    [3] = '转换为{C:bunc_halberds}深渊',
+                }
             }
         }
     },
     quaoar = {
         ['en-us'] = {
             name = 'Quaoar'
-        }
+        },
+        ['zh_CN'] = {
+            name = '创神星'
+        },
     },
     haumea = {
         ['en-us'] = {
             name = 'Haumea'
-        }
+        },
+        ['zh_CN'] = {
+            name = '妊神星'
+        },
     },
     sedna = {
         ['en-us'] = {
             name = 'Sedna'
-        }
+        },
+        ['zh_CN'] = {
+            name = '赛德娜星'
+        },
     },
     makemake = {
         ['en-us'] = {
             name = 'Makemake'
-        }
+        },
+        ['zh_CN'] = {
+            name = '鸟神星'
+        },
     },
     cleanse = {
         ['en-us'] = {
@@ -194,6 +236,13 @@ return {
             ['text'] = {
                 [1] = 'Add {C:dark_edition}Fluorescent{} to',
                 [2] = '{C:attention}#1#{} selected cards in hand'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '净化',
+            ['text'] = {
+                [1] = '为选定的{C:attention}#1#{}张手牌',
+                [2] = '添加{C:dark_edition}荧光{}版本'
             }
         }
     },
@@ -213,6 +262,14 @@ return {
                 -- TODO would be good to have a line for the side
                 -- or colorize the active side
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '磁带',
+            ['text'] = {
+                [1] = '弃牌时，翻转此牌至另一面',
+                [2] = '{C:attention}A面：{}亮色牌在计分时给予{C:chips}+#1#{}筹码',
+                [3] = '{C:attention}B面：{}暗色牌在计分时给予{C:chips}+#2#{}倍率',
+            }
         }
     },
     mosaic = {
@@ -222,6 +279,23 @@ return {
                 [1] = 'Played {C:attention}Stone Cards',
                 [2] = 'give {C:mult}+#1#{} Mult',
                 [3] = 'when scored'
+                },
+            ['unlock'] = {
+                [1] = 'Play a 5 card hand',
+                [2] = 'that contains only',
+                [3] = '{C:attention,E:1}Stone{} cards'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '拼花瓷砖小丑',
+            ['text'] = {
+                [1] = '打出的{C:attention}石头牌',
+                [2] = '在计分时',
+                [3] = '给予{C:mult}+#1#{}倍率'
+            },
+            ['unlock'] = {
+                [1] = '单次出牌包含5张牌',
+                [2] = '且均为{C:attention,E:1}石头牌'
             }
         }
     },
@@ -232,8 +306,26 @@ return {
                 [1] = '{X:mult,C:white}X#1#{} Mult, {X:mult,C:white}-X#2#{} Mult for each',
                 [2] = '{C:attention}Enhanced card{} in your {C:attention}full deck{}',
                 [3] = '{C:inactive}(Currently {X:mult,C:white}X#3#{C:inactive} Mult)'
+            },
+            ['unlock'] = {
+                [1] = 'Have at least {C:attention}10',
+                [2] = '{E:1,C:attention}Enhanced{} cards in',
+                [3] = 'your deck'
             }
-        }
+        },
+        ['zh_CN'] = {
+            ['name'] = '体素小丑',
+            ['text'] = {
+                [1] = '{X:mult,C:white}X#1#{}倍率',
+                [2] = '完整牌组中的每张',
+                [3] = '{C:attention}增强卡牌{}使倍率{X:mult,C:white}-X#2#',
+                [4] = '{C:inactive}（当前为{X:mult,C:white}X#3#{C:inactive}倍率）'
+            },
+            ['unlock'] = {
+                [1] = '牌组中拥有至少',
+                [2] = '{C:attention}10{}张{E:1,C:attention}增强卡牌'
+            }
+        },
     },
     crop_circles = {
         ['en-us'] = {
@@ -1096,6 +1188,12 @@ return {
                 [1] = 'First time score exceeds #1#',
                 [2] = 'makes played hand score 0'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '刀锋',
+            ['text'] = {
+                [1] = '首次超过#1#的得分归零',
+            }
         }
     },
     claw = {
@@ -1158,6 +1256,13 @@ return {
                 [1] = 'Cards not played previously',
                 [2] = 'this Ante are debuffed'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '靛蓝之塔',
+            ['text'] = {
+                [1] = '当前底注中未打出过的牌',
+                [2] = '全部失效'
+            }
         }
     },
     magenta_dagger = {
@@ -1166,6 +1271,13 @@ return {
             ['text'] = {
                 [1] = 'Discarding cards plays them',
                 [2] = 'and subtracts scored value'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '洋红匕首',
+            ['text'] = {
+                [1] = '弃牌反而会将其打出',
+                [2] = '并倒扣计得的分数'
             }
         }
     },
