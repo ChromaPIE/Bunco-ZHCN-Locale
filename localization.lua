@@ -279,7 +279,7 @@ return {
                 [1] = 'Played {C:attention}Stone Cards',
                 [2] = 'give {C:mult}+#1#{} Mult',
                 [3] = 'when scored'
-                },
+            },
             ['unlock'] = {
                 [1] = 'Play a 5 card hand',
                 [2] = 'that contains only',
@@ -370,6 +370,11 @@ return {
                 [2] = 'upgrade it by {C:attention}2 levels{}',
                 [3] = 'and {C:attention}destroy{} scored cards',
                 [4] = '{C:red}Lose{} all {C:attention}gained levels{} if you remove this Joker'
+            },
+            ['unlock'] = {
+                [1] = 'Reduce your deck',
+                [2] = 'by at least {E:1,C:attention}10{} cards',
+                [3] = 'in one round'
             }
         }
     },
@@ -381,6 +386,10 @@ return {
                 [2] = 'both {C:attention}rank and suit{} with an',
                 [3] = '{C:attention}already-scored card{} this round',
                 [4] = 'give {C:mult}+#1#{} Mult'
+            },
+            ['unlock'] = {
+                [1] = 'Play a',
+                [2] = '{E:1,C:attention}Flush Five'
             }
         }
     },
@@ -413,6 +422,10 @@ return {
             ['text'] = {
                 [1] = 'Gain {C:money}$#1#',
                 [2] = 'when acquired...'
+            },
+            ['unlock'] = {
+                [1] = 'Spend at least {E:1,C:attention}$100',
+                [2] = 'during a single round'
             }
         }
     },
@@ -453,6 +466,10 @@ return {
                 [2] = 'and this Joker gains {C:mult}+#1#{} Mult,',
                 [3] = '{C:red}resets{} when any Joker is rearranged',
                 [4] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)'
+            },
+            ['unlock'] = {
+                [1] = 'Defeat {E:1,C:attention}Amber Acorn',
+                [2] = 'without disabling it'
             }
         }
     },
@@ -462,6 +479,10 @@ return {
             ['text'] = {
                 [1] = '{C:attention}Standard Packs{} contain',
                 [2] = 'only {C:attention}Enhanced cards{}'
+            },
+            ['unlock'] = {
+                [1] = 'Open {E:1,C:attention}50',
+                [2] = 'Booster Packs'
             }
         }
     },
@@ -512,6 +533,10 @@ return {
                 [3] = 'go one Ante back, next time',
                 [4] = 'works only on a greater Ante'
                 -- TODO needs a line for whether it's active / ante it will be active
+            },
+            ['unlock'] = {
+                [1] = 'Reach Ante',
+                [2] = 'level {E:1,C:attention}0'
             }
         }
     },
@@ -519,8 +544,13 @@ return {
         ['en-us'] = {
             ['name'] = 'Sledgehammer',
             ['text'] = {
-                [1] = '{C:attention}Glass Cards{} give {X:mult,C:white}+X#1#{} Mult',
+                [1] = '{C:attention}Glass Cards{} give +{X:mult,C:white}X#1#{} Mult',
                 [2] = 'but are guaranteed to break'
+            },
+            ['unlock'] = {
+                [1] = 'Play a 5 card hand',
+                [2] = 'that contains only',
+                [3] = '{C:attention,E:1}Glass{} cards'
             }
         }
     },
@@ -530,6 +560,11 @@ return {
             ['text'] = {
                 [1] = '{C:blue}Common{} Jokers do not appear',
                 [2] = '{s:0.8}Different rarities appear instead'
+            },
+            ['unlock'] = {
+                [1] = 'Win a run without',
+                [2] = 'ever having',
+                [3] = '{C:attention,E:1}Common{} Jokers'
             }
         }
     },
@@ -597,6 +632,11 @@ return {
                 [1] = 'Played {C:attention}Wild Cards',
                 [2] = 'give {C:mult}+#1#{} Mult',
                 [3] = 'when scored'
+            },
+            ['unlock'] = {
+                [1] = 'Play a 5 card hand',
+                [2] = 'that contains only',
+                [3] = '{C:attention,E:1}Wild{} cards'
             }
         }
     },
@@ -607,6 +647,11 @@ return {
                 [1] = 'This Joker gains {X:mult,C:white}X#1#{} Mult',
                 [2] = 'per {C:red}debuffed{} card scored',
                 [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
+            },
+            ['unlock'] = {
+                [1] = 'Play a 5 card hand',
+                [2] = 'that contains only',
+                [3] = '{C:attention,E:1}Debuffed{} cards'
             }
         }
     },
@@ -617,6 +662,10 @@ return {
                 [1] = '{C:attention}Jokers{} next to this Joker',
                 [2] = 'are {C:red}debuffed{} and',
                 [3] = 'give {C:mult}+#1#{} Mult'
+            },
+            ['unlock'] = {
+                [1] = 'Defeat {E:1,C:attention}Verdant Leaf',
+                [2] = 'without disabling it'
             }
         }
     },
@@ -627,6 +676,10 @@ return {
                 [1] = '{C:chips}+#1#{} Chips,',
                 [2] = '{C:red}debuffs{} random Joker',
                 [3] = 'when {C:attention}Blind{} is selected'
+            },
+            ['unlock'] = {
+                [1] = 'Defeat {E:1,C:attention}Crimson Heart',
+                [2] = 'without disabling it'
             }
         },
         ['zh_CN'] = {
@@ -667,6 +720,11 @@ return {
                 [1] = '{C:attention}Stone Cards{} held in hand',
                 [2] = 'have the abilities of',
                 [3] = '{C:attention}Steel{} and {C:attention}Gold Cards'
+            },
+            ['unlock'] = {
+                [1] = 'Play a hand that',
+                [2] = 'contains {E:1,C:attention}Stone{}, {E:1,C:attention}Steel,',
+                [3] = 'and {E:1,C:attention}Gold{} cards'
             }
         }
     },
@@ -676,6 +734,11 @@ return {
             ['text'] = {
                 [1] = 'Choose an extra card',
                 [2] = 'from {C:attention}Booster Packs'
+            },
+            ['unlock'] = {
+                [1] = 'Win a run without',
+                [2] = 'ever opening',
+                [3] = '{C:attention,E:1}Booster Packs'
             }
         }
     },
@@ -696,6 +759,10 @@ return {
                 [2] = '{C:dark_edition}Polychrome{}, or {C:dark_edition}Glitter{} edition',
                 [3] = 'to a random {C:attention}consumable{}',
                 [4] = 'when {C:attention}Blind{} is selected'
+            },
+            ['unlock'] = {
+                [1] = 'Use {C:attention,E:1}5{} consumables',
+                [2] = 'with {C:attention,E:1}Editions'
             }
         }
     },
@@ -706,6 +773,11 @@ return {
                 [1] = '{C:green}#1# in #2#{} chance to upgrade',
                 [2] = '{C:attention}High Card{} when you',
                 [3] = 'upgrade any {C:attention}poker hand'
+            },
+            ['unlock'] = {
+                [1] = 'Win a run with',
+                [2] = '{C:attention,E:1}High Card{} being the',
+                [3] = 'most leveled poker hand'
             }
         }
     },
@@ -727,6 +799,10 @@ return {
                 [2] = '{C:attention}selecting{} a card has',
                 [3] = 'a {C:green}#2# in #3#{} chance to',
                 [4] = 'play selected cards'
+            },
+            ['unlock'] = {
+                [1] = 'Defeat {E:1,C:attention}Cerulean Bell',
+                [2] = 'without disabling it'
             }
         },
         ['zh_CN'] = {
@@ -788,6 +864,11 @@ return {
                 [2] = 'cards to be drawn face down',
                 [3] = 'Face down cards give',
                 [4] = '{X:mult,C:white}X#3#{} Mult when scored'
+            },
+            ['unlock'] = {
+                [1] = 'Play a 5 card hand',
+                [2] = 'that contains only',
+                [3] = '{C:attention,E:1}Flipped{} cards'
             }
         }
     },
@@ -808,6 +889,9 @@ return {
                 [1] = '{C:attention}Copy{} first consumable',
                 [2] = 'used this round',
                 [3] = '{C:inactive}(Must have room)'
+            },
+            ['unlock'] = {
+                [1] = 'Win {C:attention,E:1}10{} runs'
             }
         }
     },
@@ -846,6 +930,10 @@ return {
                 [1] = '{C:mult}+#1#{} Mult if no',
                 [2] = '{C:attention}Enhanced cards{}',
                 [3] = 'are scored'
+            },
+            ['unlock'] = {
+                [1] = 'Win a run without ever',
+                [2] = 'having {C:attention,E:1}Enhanced cards'
             }
         }
     },

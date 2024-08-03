@@ -838,6 +838,298 @@ end
 
 '''
 
+# Deck size unlocking (1/2)
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = 'G.GAME.current_round.discards_left = math.max(0, G.GAME.round_resets.discards + G.GAME.round_bonus.discards)'
+position = 'before'
+match_indent = true
+payload = '''
+
+local deck_size = 0
+
+G.GAME.last_deck_size = G.GAME.last_deck_size
+
+for k, v in pairs(G.playing_cards) do
+    deck_size = deck_size + 1
+end
+
+if G.GAME.last_deck_size ~= deck_size then
+    local locked_card
+    local difference = deck_size - G.GAME.last_deck_size
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'round_deck_size', round_deck_size_diff = difference})
+        end
+    end
+end
+
+G.GAME.last_deck_size = deck_size
+
+'''
+
+# Deck size unlocking (2/2)
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'self.HUD:recalculate()'
+position = 'after'
+match_indent = true
+payload = '''
+
+local deck_size = 0
+
+for k, v in pairs(G.playing_cards) do
+    deck_size = deck_size + 1
+end
+
+G.GAME.last_deck_size = deck_size
+
+'''
+
+# Money spending unlocking (1/2)
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = 'function ease_dollars(mod, instant)'
+position = 'after'
+match_indent = true
+payload = '''
+
+G.GAME.money_spend_this_round = G.GAME.money_spend_this_round or 0
+
+if mod < 0 then
+    G.GAME.money_spend_this_round = G.GAME.money_spend_this_round - mod
+
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'round_spend_money', round_spend_money = G.GAME.money_spend_this_round})
+        end
+    end
+end
+
+'''
+
+# Money spending unlocking (2/2)
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = 'G.GAME.current_round.discards_left = math.max(0, G.GAME.round_resets.discards + G.GAME.round_bonus.discards)'
+position = 'before'
+match_indent = true
+payload = '''G.GAME.money_spend_this_round = 0'''
+
+# Blind defeat unlocking
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''function end_round()'''
+position = 'after'
+match_indent = true
+payload = '''
+
+if not G.GAME.blind.disabled then
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'defeat_blind', blind = G.GAME.blind})
+        end
+    end
+end
+
+'''
+
+# Booster pack unlocking - Per profile
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if self.ability.set == "Booster" then'''
+position = 'after'
+match_indent = true
+payload = '''
+
+G.PROFILES[G.SETTINGS.profile].booster_packs_opened = (G.PROFILES[G.SETTINGS.profile].booster_packs_opened or 0) + 1
+if G.PROFILES[G.SETTINGS.profile].booster_packs_opened then
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'open_pack', packs_total = G.PROFILES[G.SETTINGS.profile].booster_packs_opened})
+        end
+    end
+end
+
+'''
+
+# Booster pack unlocking - Per game (1/2)
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'hands_played = 0,'
+position = 'after'
+match_indent = true
+payload = '''booster_packs_opened = 0,'''
+
+# Booster pack unlocking - Per game (2/2)
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if self.ability.set == "Booster" then'''
+position = 'after'
+match_indent = true
+payload = '''
+
+G.GAME.booster_packs_opened = G.GAME.booster_packs_opened + 1
+
+'''
+
+# Ante down unlocking
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = 'G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod'
+position = 'after'
+match_indent = true
+payload = '''
+
+if mod < 0 then
+    G.GAME.money_spend_this_round = G.GAME.money_spend_this_round - mod
+
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'ante_down', ante = G.GAME.round_resets.ante})
+        end
+    end
+end
+
+'''
+
+# Common Joker count unlocking (1/2)
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'max_jokers = 0,'
+position = 'after'
+match_indent = true
+payload = '''max_common_jokers = 0,'''
+
+# Common Joker count unlocking (2/2)
+[[patches]]
+[patches.pattern]
+target = 'cardarea.lua'
+pattern = 'if joker_tally > G.GAME.max_jokers then G.GAME.max_jokers = joker_tally end'
+position = 'after'
+match_indent = true
+payload = '''
+
+local common_joker_tally = 0
+for i = 1, #G.jokers.cards do
+    if G.jokers.cards[i].ability.set == 'Joker' and G.jokers.cards[i].config.center.rarity == 1 then common_joker_tally = common_joker_tally + 1 end
+end
+if common_joker_tally > G.GAME.max_common_jokers then G.GAME.max_common_jokers = common_joker_tally end
+
+'''
+
+# Consumables with edition unlocking
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = 'local used_tarot = copier or self'
+position = 'after'
+match_indent = true
+payload = '''
+
+if used_tarot.edition then
+    G.PROFILES[G.SETTINGS.profile].consumables_with_edition_used = (G.PROFILES[G.SETTINGS.profile].consumables_with_edition_used or 0) + 1
+    if G.PROFILES[G.SETTINGS.profile].consumables_with_edition_used then
+        local locked_card
+
+        for i = 1, #G.P_LOCKED do
+            locked_card = G.P_LOCKED[i]
+
+            if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+                locked_card:check_for_unlock({type = 'use_consumable_with_edition', used_total = G.PROFILES[G.SETTINGS.profile].consumables_with_edition_used})
+            end
+        end
+    end
+end
+
+'''
+
+# Flipped cards in hand unlocking
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''--check the hand first'''
+position = 'after'
+match_indent = true
+payload = '''
+
+local unlock_all_flipped = true
+
+for i = 1, #G.hand.highlighted do
+    if G.hand.highlighted[i].facing ~= 'back' then
+        unlock_all_flipped = false
+    end
+end
+
+if (not G.hand.highlighted) or (#G.hand.highlighted == 0) then unlock_all_flipped = false end
+
+if unlock_all_flipped and #G.hand.highlighted >= 5 then
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'play_all_flipped'})
+        end
+    end
+end
+
+'''
+
+# Enhancement usage detection unlocking (1/2)
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'bosses_used = bosses_used,'
+position = 'after'
+match_indent = true
+payload = '''enhancements_used = false,'''
+
+# Enhancement usage detection unlocking (2/2)
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''if args.type == 'modify_deck' then'''
+position = 'after'
+match_indent = true
+payload = '''
+
+local enhancement_count = 0
+for _, v in pairs(G.playing_cards) do
+    if v.config.center ~= G.P_CENTERS.c_base then G.GAME.enhancements_used = true break end
+end
+
+'''
 
 # G.FUNCS.discard_cards_from_highlighted() (The Paling 1/2)
 [[patches]]

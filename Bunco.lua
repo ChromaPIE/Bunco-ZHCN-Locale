@@ -35,6 +35,8 @@
 -- (done) Fix the mask giving spectrum hands when they're invisible
 -- Make so enhancement-related Jokers do not appear unless player has respective enhancements
 -- (done) Custom description for the Disproportionality that isn't just Misprint 2
+-- Doorhanger doesn't shake when unlocked for some reason?
+-- Make so unlocks actually count things
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
@@ -421,7 +423,20 @@ create_joker({ -- Mosaic
     vars = {{mult = 6}},
     rarity = 'Uncommon', cost = 4,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local tally = 0
+            for j = 1, #args.cards do
+                if args.cards[j].config.center == G.P_CENTERS.m_stone then
+                    tally = tally + 1
+                end
+            end
+            if tally >= 5 then 
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card.config.center == G.P_CENTERS.m_stone then
@@ -439,7 +454,18 @@ create_joker({ -- Voxel
     vars = {{base = 3}, {bonus = 0.1}, {xmult = 3}, {tally = 0}},
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'modify_deck' then
+            local count = 0
+            for _, v in pairs(G.playing_cards) do
+                if v.config.center ~= G.P_CENTERS.c_base then count = count + 1 end
+            end
+            if count >= 10 then
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             if card.ability.extra.xmult ~= 1 then
@@ -583,7 +609,12 @@ create_joker({ -- Dread
     vars = {{trash_list = {}}, {level_up_list = {}}},
     rarity = 'Rare', cost = 8,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'round_deck_size' and args.round_deck_size_diff <= -10 then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if not context.blueprint then
             if context.full_hand and not context.other_card then
@@ -655,7 +686,15 @@ create_joker({ -- Prehistoric
     vars = {{mult = 16}, {card_list = { }}},
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local eval = evaluate_poker_hand(args.cards)
+            if next(eval['Flush Five']) then
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             for k, v in pairs(card.ability.extra.card_list) do
@@ -754,7 +793,12 @@ create_joker({ -- Loan Shark
     end,
     rarity = 'Uncommon', cost = 3,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'round_spend_money' and args.round_spend_money >= 100 then
+            unlock_card(self)
+        end
+    end,
     add = function(self, card)
         ease_dollars(card.ability.extra.dollars)
         card:set_cost()
@@ -819,7 +863,12 @@ create_joker({ -- Knight
     vars = {{bonus = 6}, {mult = 0}},
     rarity = 'Uncommon', cost = 6,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'defeat_blind' and args.blind.name == 'Amber Acorn' then
+            unlock_card(self)
+        end
+    end,
     purist = false,
     calculate = function(self, card, context)
         if context.setting_blind and not card.getting_sliced and not context.blueprint then
@@ -865,7 +914,12 @@ create_joker({ -- JMJB
     name = 'JMJB', position = 15,
     rarity = 'Rare', cost = 5,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'open_pack' and args.packs_total >= 50 then
+            unlock_card(self)
+        end
+    end,
     purist = false,
     calculate = function(self, card, context)
         if context.open_booster and context.card.ability.name then
@@ -986,7 +1040,12 @@ create_joker({ -- Carnival
     vars = {{ante = -huge_number}},
     rarity = 'Rare', cost = 10,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'ante_down' and args.ante == 0 then
+            unlock_card(self)
+        end
+    end,
     purist = false,
     calculate = function(self, card, context)
         if context.end_of_round and G.GAME.blind.boss and not context.other_card and not context.blueprint then
@@ -1016,7 +1075,20 @@ create_joker({ -- Sledgehammer
     vars = {{plus_xmult = 1}, {div_chance_denom = 4}},
     rarity = 'Uncommon', cost = 5,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local tally = 0
+            for j = 1, #args.cards do
+                if args.cards[j].config.center == G.P_CENTERS.m_glass then
+                    tally = tally + 1
+                end
+            end
+            if tally >= 5 then
+                unlock_card(self)
+            end
+        end
+    end,
     add = function(self, card)
         G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
         if #SMODS.find_card('j_bunc_sledgehammer') == 1 then
@@ -1035,7 +1107,12 @@ create_joker({ -- Doorhanger
     name = 'Doorhanger', position = 21,
     rarity = 'Rare', cost = 10,
     blueprint = false, eternal = true,
-    unlocked = true
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_custom' and G.GAME.max_common_jokers == 0 then
+            unlock_card(self)
+        end
+    end,
 })
 
 create_joker({ -- Fingerprints
@@ -1228,7 +1305,20 @@ create_joker({ -- Slothful
     vars = {{mult = 9}},
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local tally = 0
+            for j = 1, #args.cards do
+                if args.cards[j].config.center == G.P_CENTERS.m_wild then
+                    tally = tally + 1
+                end
+            end
+            if tally >= 5 then
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card.config.center == G.P_CENTERS.m_wild then
@@ -1246,7 +1336,20 @@ create_joker({ -- Neon
     vars = {{bonus = 0.2}, {xmult = 1}},
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local tally = 0
+            for j = 1, #args.cards do
+                if args.cards[j].debuff then
+                    tally = tally + 1
+                end
+            end
+            if tally >= 5 then
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.debuffed_card then
             card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.bonus
@@ -1274,7 +1377,12 @@ create_joker({ -- Gameplan
     vars = {{mult = 20}},
     rarity = 'Uncommon', cost = 5,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'defeat_blind' and args.blind.name == 'Verdant Leaf' then
+            unlock_card(self)
+        end
+    end,
     update = function(self, card)
         if G.jokers then
             for i = 1, #G.jokers.cards do
@@ -1320,7 +1428,12 @@ create_joker({ -- Conquest
     vars = {{chips = 200}, {joker = 0}},
     rarity = 'Uncommon', cost = 5,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'defeat_blind' and args.blind.name == 'Crimson Heart' then
+            unlock_card(self)
+        end
+    end,
     update = function(self, card)
         if G.jokers then
             for i = 1, #G.jokers.cards do
@@ -1447,7 +1560,26 @@ create_joker({ -- Dwarven
     end,
     rarity = 'Uncommon', cost = 8,
     blueprint = false, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'hand_contents' then
+            local stone, steel, gold = false, false, false
+            for j = 1, #args.cards do
+                if args.cards[j].config.center == G.P_CENTERS.m_stone then
+                    stone = true
+                end
+                if args.cards[j].config.center == G.P_CENTERS.m_steel then
+                    steel = true
+                end
+                if args.cards[j].config.center == G.P_CENTERS.m_gold then
+                    gold = true
+                end
+            end
+            if stone and steel and gold then
+                unlock_card(self)
+            end
+        end
+    end,
     add = function(self, card)
         for _, deck_card in pairs(G.playing_cards) do
             if deck_card.config.center == G.P_CENTERS.m_stone then
@@ -1474,7 +1606,12 @@ create_joker({ -- Aristocrat
     name = 'Aristocrat', position = 33,
     rarity = 'Uncommon', cost = 6,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_custom' and G.GAME.booster_packs_opened == 0 then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.open_booster and context.card.ability.name then
             event({
@@ -1537,7 +1674,12 @@ create_joker({ -- Juggalo
     end,
     rarity = 'Rare', cost = 8,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'use_consumable_with_edition' and args.used_total >= 5 then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.setting_blind then
             if G.consumeables.cards[1] then
@@ -1576,7 +1718,21 @@ create_joker({ -- Head in the Clouds
     end,
     rarity = 'Uncommon', cost = 6,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_custom' then
+            local handname, level, order = 'High Card', -1, 100
+            for k, v in pairs(G.GAME.hands) do
+                if v.level > level or (v.level == level and order > v.order) then
+                    level = v.level
+                    handname = k
+                end
+            end
+            if handname == 'High Card' and level > 0 then
+                unlock_card(self)
+            end
+        end
+    end,
     calculate = function(self, card, context)
         if context.level_up_hand and context.level_up_hand ~= self.name then
             if pseudorandom('head_in_the_clouds'..G.SEED) < G.GAME.probabilities.normal / card.ability.extra.odds then
@@ -1636,7 +1792,12 @@ create_joker({ -- Trigger Finger
     end,
     rarity = 'Rare', cost = 8,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'defeat_blind' and args.blind.name == 'Cerulean Bell' then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.highlight_card and (G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND) then
             local cards = {}
@@ -1788,7 +1949,12 @@ create_joker({ -- Vandalism
     end,
     rarity = 'Rare', cost = 6,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'play_all_flipped' then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.stay_flipped and not context.blueprint then
             big_juice(card)
@@ -1867,7 +2033,12 @@ create_joker({ -- Doodle
     vars = {{active = true}},
     rarity = 'Rare', cost = 10,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_custom' and (G.PROFILES[G.SETTINGS.profile].career_stats.c_wins + 1) >= 10 then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.end_of_round then
             if not card.ability.extra.active then
@@ -2006,7 +2177,12 @@ create_joker({ -- Rasta
     vars = {{mult = 20}},
     rarity = 'Common', cost = 5,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    check_for_unlock = function(self, args)
+        if args.type == 'win_custom' and not G.GAME.enhancements_used then
+            unlock_card(self)
+        end
+    end,
     calculate = function(self, card, context)
         if context.joker_main then
             local enhancement = false
@@ -3849,3 +4025,9 @@ SMODS.Edition{
 
     shader = 'fluorescent'
 }
+
+-- Mod compatibility
+
+if _G["JokerDisplay"] then
+    filesystem.load(bunco.path..'compat/jokerdisplay.lua')()
+end
