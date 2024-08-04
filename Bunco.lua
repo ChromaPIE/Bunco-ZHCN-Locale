@@ -33,7 +33,7 @@
 -- (done) Reset metallurgist-like bonuses when you lose
 -- (done) Reset metallurgist-like bonuses when Joker is debuffed
 -- (done) Fix the mask giving spectrum hands when they're invisible
--- Make so enhancement-related Jokers do not appear unless player has respective enhancements
+-- (done) Make so enhancement-related Jokers do not appear unless player has respective enhancements
 -- (done) Custom description for the Disproportionality that isn't just Misprint 2
 -- Doorhanger doesn't shake when unlocked for some reason?
 -- Make so unlocks actually count things
@@ -279,6 +279,7 @@ local function create_joker(joker)
 
         unlocked = joker.unlocked,
         check_for_unlock = joker.check_for_unlock,
+        unlock_condition = joker.unlock_condition,
         discovered = false,
 
         blueprint_compat = joker.blueprint,
@@ -309,7 +310,7 @@ local function create_joker(joker)
         remove_from_deck = joker.remove,
         add_to_deck = joker.add,
         set_ability = joker.set_ability,
-        in_pool = pool,
+        in_pool = joker.custom_in_pool or pool,
 
         effect = joker.effect
         }
@@ -373,14 +374,15 @@ create_joker({ -- Cassette
     unlocked = true,
     calculate = function(self, card, context)
         if context.pre_discard then
+            card:flip()
+        end
 
+        if context.flip then
             if card.ability.extra.side == 'A' then
                 card.ability.extra.side = 'B'
             else
                 card.ability.extra.side = 'A'
             end
-
-            card:flip() card:flip() -- Double flip plays the animation but doesn't flip the card, awesome!
         end
 
         if context.individual and context.cardarea == G.play then
@@ -432,10 +434,19 @@ create_joker({ -- Mosaic
                     tally = tally + 1
                 end
             end
-            if tally >= 5 then 
+            if tally >= 5 then
                 unlock_card(self)
             end
         end
+    end,
+    custom_in_pool = function()
+        local condition = false
+        if G.playing_cards then
+            for k, v in pairs(G.playing_cards) do
+                if v.config.center == G.P_CENTERS.m_stone then condition = true break end
+            end
+        end
+        return condition
     end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
@@ -956,7 +967,6 @@ create_joker({ -- Dogs Playing Poker
     rarity = 'Uncommon', cost = 5,
     blueprint = true, eternal = true,
     unlocked = true,
-    purist = false,
     calculate = function(self, card, context)
         if context.joker_main then
 
@@ -1089,6 +1099,15 @@ create_joker({ -- Sledgehammer
             end
         end
     end,
+    custom_in_pool = function()
+        local condition = false
+        if G.playing_cards then
+            for k, v in pairs(G.playing_cards) do
+                if v.config.center == G.P_CENTERS.m_glass then condition = true break end
+            end
+        end
+        return condition
+    end,
     add = function(self, card)
         G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
         if #SMODS.find_card('j_bunc_sledgehammer') == 1 then
@@ -1208,10 +1227,10 @@ create_joker({ -- Bierdeckel
     name = 'Bierdeckel', position = 25,
     vars = {{bonus = 10}},
     rarity = 'Uncommon', cost = 4,
-    blueprint = false, eternal = true,
+    blueprint = true, eternal = true,
     unlocked = true,
     calculate = function(self, card, context)
-        if (context.after or context.discard and context.other_card == context.full_hand[#context.full_hand]) and not context.blueprint then
+        if (context.after or context.discard and context.other_card == context.full_hand[1]) then
             local full_hand_set = {}
             if context.discard then
                 for _, c in ipairs(context.full_hand) do
@@ -1226,7 +1245,7 @@ create_joker({ -- Bierdeckel
             end
 
             -- maybe juice all held cards, that'd be fun
-            forced_message(localize('k_upgrade_ex'), card, G.C.CHIPS, true)
+            forced_message(localize('k_upgrade_ex'), context.blueprint_card or card, G.C.CHIPS, true)
         end
     end
 })
@@ -1319,6 +1338,15 @@ create_joker({ -- Slothful
             end
         end
     end,
+    custom_in_pool = function()
+        local condition = false
+        if G.playing_cards then
+            for k, v in pairs(G.playing_cards) do
+                if v.config.center == G.P_CENTERS.m_wild then condition = true break end
+            end
+        end
+        return condition
+    end,
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play then
             if context.other_card.config.center == G.P_CENTERS.m_wild then
@@ -1376,7 +1404,7 @@ create_joker({ -- Gameplan
     name = 'Gameplan', position = 29,
     vars = {{mult = 20}},
     rarity = 'Uncommon', cost = 5,
-    blueprint = false, eternal = true,
+    blueprint = true, eternal = true,
     unlocked = false,
     check_for_unlock = function(self, args)
         if args.type == 'defeat_blind' and args.blind.name == 'Verdant Leaf' then
@@ -1427,7 +1455,7 @@ create_joker({ -- Conquest
     name = 'Conquest', position = 30,
     vars = {{chips = 200}, {joker = 0}},
     rarity = 'Uncommon', cost = 5,
-    blueprint = false, eternal = true,
+    blueprint = true, eternal = true,
     unlocked = false,
     check_for_unlock = function(self, args)
         if args.type == 'defeat_blind' and args.blind.name == 'Crimson Heart' then
@@ -1449,7 +1477,7 @@ create_joker({ -- Conquest
         end
     end,
     calculate = function(self, card, context)
-        if context.setting_blind then
+        if context.setting_blind and not context.blueprint then
             local my_pos = nil
             for i = 1, #G.jokers.cards do
                 if G.jokers.cards[i] == card then my_pos = i; break end
@@ -1476,7 +1504,7 @@ create_joker({ -- Conquest
                     vars = { card.ability.extra.chips }
                 },
                 chip_mod = card.ability.extra.chips,
-                card = card
+                card = context.blueprint_card or card
             }
         end
     end
@@ -1580,6 +1608,15 @@ create_joker({ -- Dwarven
             end
         end
     end,
+    custom_in_pool = function()
+        local condition = false
+        if G.playing_cards then
+            for k, v in pairs(G.playing_cards) do
+                if v.config.center == G.P_CENTERS.m_stone then condition = true break end
+            end
+        end
+        return condition
+    end,
     add = function(self, card)
         for _, deck_card in pairs(G.playing_cards) do
             if deck_card.config.center == G.P_CENTERS.m_stone then
@@ -1645,6 +1682,15 @@ create_joker({ -- Metallurgist
     rarity = 'Common', cost = 6,
     blueprint = false, eternal = true,
     unlocked = true,
+    custom_in_pool = function()
+        local condition = false
+        if G.playing_cards then
+            for k, v in pairs(G.playing_cards) do
+                if v.config.center == G.P_CENTERS.m_gold then condition = true break end
+            end
+        end
+        return condition
+    end,
     add = function(self, card)
         for _, deck_card in pairs(G.playing_cards) do
             if deck_card.config.center == G.P_CENTERS.m_gold then
@@ -1732,6 +1778,13 @@ create_joker({ -- Head in the Clouds
                 unlock_card(self)
             end
         end
+    end,
+    custom_in_pool = function()
+        local condition = false
+        if G.GAME and G.GAME.hands then
+            if G.GAME.hands['High Card'].level > 1 then condition = true end
+        end
+        return condition
     end,
     calculate = function(self, card, context)
         if context.level_up_hand and context.level_up_hand ~= self.name then
@@ -2342,7 +2395,7 @@ create_joker({ -- Zealous
     type = 'Exotic',
     name = 'Zealous', position = 1,
     custom_vars = function(self, info_queue, card) return {vars = {card.ability.t_mult}} end,
-    custom_config = {t_mult = 30, type = 'h_bunc_Spectrum'},
+    custom_config = {t_mult = 16, type = 'h_bunc_Spectrum'},
     rarity = 'Common', cost = 3,
     blueprint = true, eternal = true,
     unlocked = true
@@ -2361,7 +2414,7 @@ create_joker({ -- Lurid
 create_joker({ -- Envious
     type = 'Exotic',
     name = 'Envious', position = 3,
-    vars = {{s_mult = 12}, {suit = 'bunc_Fleurons'}},
+    vars = {{s_mult = 6}, {suit = 'bunc_Fleurons'}},
     rarity = 'Common', cost = 5,
     blueprint = true, eternal = true,
     unlocked = true,
@@ -2371,8 +2424,7 @@ create_joker({ -- Envious
 create_joker({ -- Proud
     type = 'Exotic',
     name = 'Proud', position = 4,
-    custom_vars = function(self, info_queue, card) return {vars = {card.ability.extra.s_mult}} end,
-    custom_config = {extra = {s_mult = 12, suit = 'bunc_Halberds'}},
+    vars = {{s_mult = 6}, {suit = 'bunc_Halberds'}},
     rarity = 'Common', cost = 5,
     blueprint = true, eternal = true,
     unlocked = true,
@@ -2409,7 +2461,7 @@ create_joker({ -- Wishalloy
 create_joker({ -- Unobtanium
     type = 'Exotic',
     name = 'Unobtanium', position = 6,
-    vars = {{chips = 100}, {mult = 12}},
+    vars = {{chips = 30}, {mult = 6}},
     rarity = 'Uncommon', cost = 7,
     blueprint = true, eternal = true,
     unlocked = true,
@@ -2616,7 +2668,8 @@ create_joker({ -- Rigoletto
     end,
     rarity = 'Legendary', cost = 20,
     blueprint = true, eternal = true,
-    unlocked = true,
+    unlocked = false,
+    unlock_condition = {hidden = true},
     calculate = function(self, card, context)
         if context.joker_main then
             if card.ability.extra.xmult ~= 1 then
@@ -3739,12 +3792,15 @@ SMODS.Back{ -- Fairy
                     end
 
                     local suits = {'bunc_FLEURON', 'bunc_HALBERD'}
+                    local cards = {}
 
                     for i = 1, self.config.amount do
                         local rank = pseudorandom_element(numbers, pseudoseed('fairy'..G.SEED))
                         local suit = pseudorandom_element(suits, pseudoseed('fairy'..G.SEED))
-                        create_playing_card({front = G.P_CARDS[suit .. '_' .. rank]}, G.deck, false, false, {G.C.BUNCO_EXOTIC})
+                        table.insert(cards, create_playing_card({front = G.P_CARDS[suit .. '_' .. rank]}, G.deck, false, false, {G.C.BUNCO_EXOTIC}))
                     end
+
+                    playing_card_joker_effects(cards)
 
                     return true
                 end)

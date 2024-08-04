@@ -564,7 +564,7 @@ return {
             ['unlock'] = {
                 [1] = 'Win a run without',
                 [2] = 'ever having',
-                [3] = '{C:attention,E:1}Common{} Jokers'
+                [3] = '{C:attention}Common{} Jokers' -- Sorry, no E:1! It doesn't work
             }
         }
     },
@@ -585,7 +585,7 @@ return {
                 [1] = 'This Joker gains {X:green,C:white}X#1#{} to',
                 [2] = '{C:green,E:1,S:1.1}probabilities{} {C:attention}this round{} when a',
                 [3] = 'card with {C:attention}no{}, {C:attention}zero{}, or {C:attention}non-count{}',
-                [4] = 'rank scores {C:inactive}(K, Q, J, 0, Stone)',
+                [4] = 'rank scores {C:inactive}(K, Q, J, 0, Rankless)',
                 [5] = '{C:inactive}(Currently {X:green,C:white}X#2#{C:inactive} to {C:green,E:1,S:1.1}probabilities{C:inactive})'
                 -- TODO not sure how to word non-countable
             }
@@ -1135,6 +1135,9 @@ return {
                 [1] = '{X:mult,C:white}X#1#{} Mult per {C:bunco_exotic}Exotic card{}',
                 [2] = 'in your {C:attention}full deck',
                 [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
+            },
+            ['unlock'] = {
+                [1] = '{E:1,s:1.3}?????'
             }
         }
     },
