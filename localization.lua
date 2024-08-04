@@ -335,6 +335,14 @@ return {
                 [2] = '{C:attention}8s{} give {C:mult}+2{} Mult,',
                 [3] = '{C:attention}Qs{}, {C:attention}10s{}, {C:attention}9s{}, {C:attention}6s{} give {C:mult}+1{} Mult'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '麦田怪圈',
+            ['text'] = {
+                [1] = '{C:clubs}梅花{}牌给予{C:mult}+3{}倍率',
+                [2] = '{C:attention}8{}给予{C:mult}+2{}倍率',
+                [3] = '{C:attention}Q{}、{C:attention}10{}、{C:attention}9{}和{C:attention}6{}给予{C:mult}+1{}倍率'
+            }
         }
     },
     crop_circles_exotic = {
@@ -345,6 +353,15 @@ return {
                 [2] = 'Base suit {C:clubs}Clubs{} give {C:mult}+3{} Mult,',
                 [3] = '{C:attention}8s{} give {C:mult}+2{} Mult,',
                 [4] = '{C:attention}Qs{}, {C:attention}10s{}, {C:attention}9s{}, {C:attention}6s{} give {C:mult}+1{} Mult'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '麦田怪圈',
+            ['text'] = {
+                [1] = '{C:bunc_fleurons}印花{}牌给予{C:mult}+4{}倍率',
+                [2] = '{C:clubs}梅花{}牌给予{C:mult}+3{}倍率',
+                [3] = '{C:attention}8{}给予{C:mult}+2{}倍率',
+                [4] = '{C:attention}Q{}、{C:attention}10{}、{C:attention}9{}和{C:attention}6{}给予{C:mult}+1{}倍率'
             }
         }
     },
@@ -359,6 +376,17 @@ return {
             ['unlock'] = {
                 [1] = 'Complete the {E:1,C:attention}X-ray Vision',
                 [2] = 'challenge'
+            },
+            ['zh_CN'] = {
+                ['name'] = 'X光',
+                ['text'] = {
+                    [1] = '每抽到一张背面朝上的牌',
+                    [2] = '本牌获得{X:mult,C:white}X#1#{}倍率',
+                    [3] = '{C:inactive}（当前为{X:mult,C:white}X#2#{C:inactive}倍率）'
+                },
+                ['unlock'] = {
+                    [1] = '完成{E:1,C:attention}透视眼{}挑战'
+                }
             }
         }
     },
