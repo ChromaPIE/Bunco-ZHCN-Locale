@@ -617,6 +617,16 @@ return {
                 [5] = '{C:inactive}(Currently {C:attention}X#2#{C:inactive} to {C:green,E:1,S:1.1}probabilities{C:inactive})'
                 -- TODO not sure how to word non-countable
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '零蛋凌旦',
+            ['text'] = {
+                [1] = '每有一张{C:attention}无点数{}、{C:attention}点数为0',
+                [2] = '或{C:attention}非数字牌{}计分时',
+                [3] = '本牌在{C:attention}当前回合{}内',
+                [4] = '获得{C:attention}#1#X{C:green,E:1,S:1.1}几率加成',
+                [5] = '{C:inactive}（当前{C:green,E:1,S:1.1}几率加成{C:inactive}：{C:attention}X#2#{C:inactive}）'
+            }
         }
     },
     nil_bill = {
@@ -1355,6 +1365,12 @@ return {
                 [1] = 'Leftmost Joker',
                 [2] = 'is debuffed'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '风',
+            ['text'] = {
+                [1] = '最左侧的小丑牌失效',
+            }
         }
     },
     prince = {
@@ -1364,6 +1380,12 @@ return {
                 [1] = 'All Jokers are debuffed',
                 [2] = 'until first hand is played'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '王子',
+            ['text'] = {
+                [1] = '首次出牌前所有小丑牌失效',
+            }
         }
     },
     depths = {
@@ -1372,6 +1394,13 @@ return {
             ['text'] = {
                 [1] = 'After Play, gain Eternal,',
                 [2] = 'Perishable, or Rental tag'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '纵深',
+            ['text'] = {
+                [1] = '出牌后，随机获得永恒、',
+                [2] = '易腐或出租标签'
             }
         }
     },
@@ -1577,6 +1606,13 @@ return {
                 [1] = 'Next shop Joker',
                 [2] = 'will gain {C:attention}Eternal{} sticker'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '永恒标签',
+            ['text'] = {
+                [1] = '下一间商店内的小丑牌',
+                [2] = '将带有{C:attention}永恒{}标贴'
+            }
         }
     },
     perishable = {
@@ -1586,6 +1622,13 @@ return {
                 [1] = 'Next shop Joker',
                 [2] = 'will gain {C:attention}Perishable{} sticker'
             }
+        },
+        ['zh_CN'] = {
+            ['name'] = '易腐标签',
+            ['text'] = {
+                [1] = '下一间商店内的小丑牌',
+                [2] = '将带有{C:attention}易腐{}标贴'
+            }
         }
     },
     rental = {
@@ -1594,6 +1637,13 @@ return {
             ['text'] = {
                 [1] = 'Next shop Joker',
                 [2] = 'will gain {C:attention}Perishable{} sticker'
+            }
+        },
+        ['zh_CN'] = {
+            ['name'] = '出租标签',
+            ['text'] = {
+                [1] = '下一间商店内的小丑牌',
+                [2] = '将带有{C:attention}出租{}标贴'
             }
         }
     },
