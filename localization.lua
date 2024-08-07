@@ -610,11 +610,11 @@ return {
         ['en-us'] = {
             ['name'] = 'Zero Shapiro',
             ['text'] = {
-                [1] = 'This Joker gains {X:green,C:white}X#1#{} to',
+                [1] = 'This Joker gains {C:attention}#1#X{} to',
                 [2] = '{C:green,E:1,S:1.1}probabilities{} {C:attention}this round{} when a',
                 [3] = 'card with {C:attention}no{}, {C:attention}zero{}, or {C:attention}non-count{}',
                 [4] = 'rank scores {C:inactive}(K, Q, J, 0, Rankless)',
-                [5] = '{C:inactive}(Currently {X:green,C:white}X#2#{C:inactive} to {C:green,E:1,S:1.1}probabilities{C:inactive})'
+                [5] = '{C:inactive}(Currently {C:attention}X#2#{C:inactive} to {C:green,E:1,S:1.1}probabilities{C:inactive})'
                 -- TODO not sure how to word non-countable
             }
         }
@@ -673,7 +673,7 @@ return {
             ['name'] = 'Neon Joker',
             ['text'] = {
                 [1] = 'This Joker gains {X:mult,C:white}X#1#{} Mult',
-                [2] = 'per {C:red}debuffed{} card scored',
+                [2] = 'per {C:attention}debuffed{} card scored',
                 [3] = '{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
             },
             ['unlock'] = {
@@ -789,7 +789,7 @@ return {
                 [4] = 'when {C:attention}Blind{} is selected'
             },
             ['unlock'] = {
-                [1] = 'Use {C:attention,E:1}5{} consumables',
+                [1] = 'Use {C:attention,E:1}10{} consumables',
                 [2] = 'with {C:attention,E:1}Editions'
             }
         }
@@ -1348,6 +1348,33 @@ return {
             }
         }
     },
+    wind = {
+        ['en-us'] = {
+            ['name'] = 'The Wind',
+            ['text'] = {
+                [1] = 'Leftmost Joker',
+                [2] = 'is debuffed'
+            }
+        }
+    },
+    prince = {
+        ['en-us'] = {
+            ['name'] = 'The Prince',
+            ['text'] = {
+                [1] = 'All Jokers are debuffed',
+                [2] = 'until first hand is played'
+            }
+        }
+    },
+    depths = {
+        ['en-us'] = {
+            ['name'] = 'The Depths',
+            ['text'] = {
+                [1] = 'After Play, gain Eternal,',
+                [2] = 'Perishable, or Rental tag'
+            }
+        }
+    },
 
     -- Finishers
 
@@ -1543,6 +1570,33 @@ return {
             }
         }
     },
+    eternal = {
+        ['en-us'] = {
+            ['name'] = 'Eternal Tag',
+            ['text'] = {
+                [1] = 'Next shop Joker',
+                [2] = 'will gain {C:attention}Eternal{} sticker'
+            }
+        }
+    },
+    perishable = {
+        ['en-us'] = {
+            ['name'] = 'Perishable Tag',
+            ['text'] = {
+                [1] = 'Next shop Joker',
+                [2] = 'will gain {C:attention}Perishable{} sticker'
+            }
+        }
+    },
+    rental = {
+        ['en-us'] = {
+            ['name'] = 'Rental Tag',
+            ['text'] = {
+                [1] = 'Next shop Joker',
+                [2] = 'will gain {C:attention}Perishable{} sticker'
+            }
+        }
+    },
 
     -- Editions
 
@@ -1601,6 +1655,33 @@ return {
                 [1] = 'All consumables in',
                 [2] = '{C:attention}Booster Packs{} will',
                 [3] = 'appear with {C:dark_edition}Edition'
+            },
+            ['unlock'] = {
+                [1] = 'Use {C:attention,E:1}5{} consumables',
+                [2] = 'with {C:attention,E:1}Editions'
+            }
+        }
+    },
+    hedge_trimmer = {
+        ['en-us'] = {
+            ['name'] = 'Hedge Trimmer',
+            ['text'] = {
+                [1] = "Reduce blind's score",
+                [2] = 'by {C:attention}#1#%{} every hand played'
+            }
+        }
+    },
+    chainsaw = {
+        ['en-us'] = {
+            ['name'] = 'Chainsaw',
+            ['text'] = {
+                [1] = 'All required scores',
+                [2] = 'reduced by {C:attention}#1#%{}'
+            },
+            ['unlock'] = {
+                [1] = "Reduce blind's score using",
+                [2] = 'Hedge Trimmer',
+                [3] = 'a total of {C:attention,E:1}20{} times'
             }
         }
     }

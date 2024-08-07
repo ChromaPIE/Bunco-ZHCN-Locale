@@ -2022,3 +2022,51 @@ if self.edition and self.edition.bunc_fluorescent then
 end
 
 '''
+
+# function Blind:press_play() (Hedge Trimmer)
+[[patches]]
+[patches.pattern]
+target = 'blind.lua'
+pattern = 'function Blind:press_play()'
+position = 'after'
+match_indent = true
+payload = '''
+
+if G.GAME.used_vouchers['v_bunc_hedge_trimmer'] then
+    local final_chips = (G.GAME.blind.chips / 100) * (100 - SMODS.Centers['v_bunc_hedge_trimmer'].config.percent)
+    local chip_mod -- iterate over ~120 ticks
+    if type(G.GAME.blind.chips) ~= 'table' then
+        chip_mod = math.ceil((G.GAME.blind.chips - final_chips) / 120)
+    else
+        chip_mod = ((G.GAME.blind.chips - final_chips) / 120):ceil()
+    end
+    local step = 0
+    G.E_MANAGER:add_event(Event({trigger = 'after', blocking = true, func = function()
+        G.GAME.blind.chips = G.GAME.blind.chips - G.SETTINGS.GAMESPEED * chip_mod
+        if G.GAME.blind.chips > final_chips then
+            G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+            if step % 5 == 0 then
+                play_sound('chips1', 1.0 - (step * 0.005))
+            end
+            step = step + 1
+        else
+            G.GAME.blind.chips = final_chips
+            G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+            return true
+        end
+    end}))
+
+    G.PROFILES[G.SETTINGS.profile].hedge_trimmer_usage = (G.PROFILES[G.SETTINGS.profile].hedge_trimmer_usage or 0) + 1
+
+    local locked_card
+
+    for i = 1, #G.P_LOCKED do
+        locked_card = G.P_LOCKED[i]
+
+        if not locked_card.unlocked and locked_card.check_for_unlock and type(locked_card.check_for_unlock) == 'function' then
+            locked_card:check_for_unlock({type = 'hedge_trimmer_used', used_total = G.PROFILES[G.SETTINGS.profile].hedge_trimmer_usage})
+        end
+    end
+end
+
+'''

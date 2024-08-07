@@ -196,6 +196,86 @@ function Card:get_chip_bonus()
     return Card_get_chip_bonus(self) + (self.ability and type(self.ability) == 'table' and not self.debuff and self.ability.temporary_extra_chips or 0)
 end
 
+-- Miscellaneous stuff
+
+local original_game_update = Game.update
+
+function Game:update(dt)
+
+    -- The Wind
+
+    if G.GAME and G.GAME.blind and G.GAME.blind.name == 'bl_bunc_wind' and G.GAME.blind.ready and not G.GAME.blind.disabled then
+        if G.jokers then
+            for i = 1, #G.jokers.cards do
+                G.GAME.blind:debuff_card(G.jokers.cards[i])
+            end
+        end
+    end
+
+    original_game_update(self, dt)
+end
+
+function bunco.set_debuff(card)
+
+    -- Fluorescent edition
+
+    if card.edition and card.edition.bunc_fluorescent then
+        return 'prevent_debuff'
+    end
+
+    -- Card position
+
+    local my_pos = nil
+    for i = 1, #G.jokers.cards do
+        if G.jokers.cards[i] == card then my_pos = i; break end
+    end
+
+    -- The Wind
+
+    if G.GAME.blind.name == 'bl_bunc_wind' and G.GAME.blind.ready and not G.GAME.blind.disabled and my_pos == 1 then
+        return true
+    end
+
+    -- The Prince
+
+    if G.GAME.blind.name == 'bl_bunc_prince' and G.GAME.blind.ready and not G.GAME.blind.disabled and card.area == G.jokers then
+        return true
+    end
+
+    -- Gameplan
+
+    if my_pos then
+        if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
+        if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
+    end
+
+    -- Conquest
+
+    for i = 1, #G.jokers.cards do
+        if G.jokers.cards[i].config.center.key == 'j_bunc_conquest' then
+            if G.jokers.cards[i].ability.extra.joker ~= 0 and card == G.jokers.cards[i].ability.extra.joker then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+local original_start_run = Game.start_run
+
+function Game:start_run(args)
+    original_start_run(self, args)
+
+    local sledgehammers = SMODS.find_card('j_bunc_sledgehammer')
+    for _, card in ipairs(sledgehammers) do
+        G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
+    end
+    if #sledgehammers >= 1 then
+        G.P_CENTERS.m_glass.config.extra = G.P_CENTERS.m_glass.config.extra / SMODS.Jokers['j_bunc_sledgehammer'].config.extra.div_chance_denom
+    end
+end
+
 -- Joker creation setup
 
 SMODS.Atlas({key = 'bunco_jokers', path = 'Jokers/Jokers.png', px = 71, py = 95})
@@ -318,53 +398,6 @@ local function create_joker(joker)
 end
 
 -- Jokers
-
-function bunco.set_debuff(card)
-    -- Fluorescent edition
-    if card.edition and card.edition.bunc_fluorescent then
-        return 'prevent_debuff'
-    end
-
-    -- Jokers
-
-    local my_pos = nil
-    for i = 1, #G.jokers.cards do
-        if G.jokers.cards[i] == card then my_pos = i; break end
-    end
-
-    -- Gameplan
-
-    if my_pos then
-        if G.jokers.cards[my_pos - 1] and G.jokers.cards[my_pos - 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos - 1].debuff then return true end
-        if G.jokers.cards[my_pos + 1] and G.jokers.cards[my_pos + 1].config.center.key == 'j_bunc_gameplan' and not G.jokers.cards[my_pos + 1].debuff then return true end
-    end
-
-    -- Conquest
-
-    for i = 1, #G.jokers.cards do
-        if G.jokers.cards[i].config.center.key == 'j_bunc_conquest' then
-            if G.jokers.cards[i].ability.extra.joker ~= 0 and card == G.jokers.cards[i].ability.extra.joker then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-local original_start_run = Game.start_run
-
-function Game:start_run(args)
-    original_start_run(self, args)
-
-    local sledgehammers = SMODS.find_card('j_bunc_sledgehammer')
-    for _, card in ipairs(sledgehammers) do
-        G.P_CENTERS.m_glass.config.Xmult = G.P_CENTERS.m_glass.config.Xmult + card.ability.extra.plus_xmult
-    end
-    if #sledgehammers >= 1 then
-        G.P_CENTERS.m_glass.config.extra = G.P_CENTERS.m_glass.config.extra / SMODS.Jokers['j_bunc_sledgehammer'].config.extra.div_chance_denom
-    end
-end
 
 create_joker({ -- Cassette
     name = 'Cassette', position = 1,
@@ -1722,7 +1755,7 @@ create_joker({ -- Juggalo
     blueprint = true, eternal = true,
     unlocked = false,
     check_for_unlock = function(self, args)
-        if args.type == 'use_consumable_with_edition' and args.used_total >= 5 then
+        if args.type == 'use_consumable_with_edition' and args.used_total >= 10 then
             unlock_card(self)
         end
     end,
@@ -3427,6 +3460,7 @@ SMODS.Blind{ -- The Bulwark
                         end
                         G.hand.config.highlighted_limit = original_limit or 5
                         G.FUNCS.discard_cards_from_highlighted(nil, true)
+                        G.GAME.blind:wiggle()
                     end
                 return true end })
                 G.GAME.blind.triggered = true
@@ -3620,6 +3654,80 @@ SMODS.Blind{ -- The Cadaver
     boss_colour = HEX('a132d5'),
 
     pos = {y = 15},
+    atlas = 'bunco_blinds'
+}
+
+SMODS.Blind{ -- The Wind
+    key = 'wind', loc_txt = loc.wind,
+    boss = {min = 6},
+
+    drawn_to_hand = function(self)
+        if not G.GAME.blind.disabled and G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0 then
+            G.GAME.blind.ready = true
+            if G.jokers and G.jokers.cards[1] then big_juice(G.jokers.cards[1]) end
+            G.GAME.blind:wiggle()
+        end
+    end,
+
+    boss_colour = HEX('a6cdef'),
+
+    pos = {y = 16},
+    atlas = 'bunco_blinds'
+}
+
+SMODS.Blind{ -- The Prince
+    key = 'prince', loc_txt = loc.prince,
+    boss = {min = 6},
+
+    drawn_to_hand = function(self)
+        if not G.GAME.blind.disabled and G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0 then
+            G.GAME.blind.ready = true
+            if G.jokers and G.jokers.cards then
+                for i = 1, #G.jokers.cards do
+                    G.GAME.blind:debuff_card(G.jokers.cards[i])
+                    big_juice(G.jokers.cards[i])
+                end
+            end
+            G.GAME.blind:wiggle()
+        end
+        if not G.GAME.blind.disabled and G.GAME.current_round.hands_played > 0 then
+            G.GAME.blind:disable()
+        end
+    end,
+
+    boss_colour = HEX('f31745'),
+
+    pos = {y = 17},
+    atlas = 'bunco_blinds'
+}
+
+SMODS.Blind{ -- The Depths
+    key = 'depths', loc_txt = loc.depths,
+    boss = {min = 4},
+
+    press_play = function(self)
+        if not G.GAME.blind.disabled then
+            local stickers = {'tag_bunc_eternal', 'tag_bunc_perishable', 'tag_bunc_rental'}
+
+            add_tag(Tag(stickers[math.random(#stickers)]))
+
+            G.GAME.blind:wiggle()
+            G.GAME.blind.triggered = true
+            delay(0.7)
+        end
+    end,
+
+    in_pool = function()
+        if G.GAME.round_resets.ante < 3 or get_deck_win_stake() < 7 then
+            return false
+        else
+            return true
+        end
+    end,
+
+    boss_colour = HEX('3f3f3f'),
+
+    pos = {y = 18},
     atlas = 'bunco_blinds'
 }
 
@@ -3832,7 +3940,7 @@ SMODS.Tag{ -- Glitter
                 G.CONTROLLER.locks[lock] = true
 
                 context.card.temp_edition = true
-                tag:yep('+', G.C.DARK_EDITION,function()
+                tag:yep('+', G.C.DARK_EDITION, function()
                     context.card:set_edition({bunc_glitter = true}, true)
                     context.card.ability.couponed = true
                     context.card:set_cost()
@@ -3869,7 +3977,7 @@ SMODS.Tag{ -- Fluorescent
                 G.CONTROLLER.locks[lock] = true
 
                 context.card.temp_edition = true
-                tag:yep('+', G.C.DARK_EDITION,function()
+                tag:yep('+', G.C.DARK_EDITION, function()
                     context.card:set_edition({bunc_fluorescent = true}, true)
                     context.card.ability.couponed = true
                     context.card:set_cost()
@@ -4043,6 +4151,114 @@ SMODS.Tag{ -- Filigree
     in_pool = exotic_in_pool
 }
 
+SMODS.Tag{ -- Eternal
+    key = 'eternal', loc_txt = loc.eternal,
+
+    config = {type = 'store_joker_modify'},
+    loc_vars = function(self, info_queue)
+        info_queue[#info_queue + 1] = {key = 'eternal', set = 'Other'}
+        return {}
+    end,
+
+    apply = function(tag, context)
+        if context.type == 'store_joker_modify' then
+            local applied = nil
+            if not context.card.ability.eternal and not context.card.ability.perishable and context.card.ability.set == 'Joker' then
+                local lock = tag.ID
+                G.CONTROLLER.locks[lock] = true
+                tag:yep('+', G.C.RED, function()
+                    context.card:set_eternal(true)
+                    big_juice(context.card)
+                    context.card:set_cost()
+                    G.CONTROLLER.locks[lock] = nil
+                    return true
+                end)
+                applied = true
+
+                tag.triggered = true
+            end
+            return applied
+        end
+    end,
+
+    pos = coordinate(8),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
+SMODS.Tag{ -- Perishable
+    key = 'perishable', loc_txt = loc.perishable,
+
+    config = {type = 'store_joker_modify'},
+    loc_vars = function(self, info_queue)
+        info_queue[#info_queue + 1] = {key = 'perishable', set = 'Other', vars = {G.GAME.perishable_rounds or 1, G.GAME.perishable_rounds or G.GAME.perishable_rounds}}
+        return {}
+    end,
+
+    apply = function(tag, context)
+        if context.type == 'store_joker_modify' then
+            local applied = nil
+            if not context.card.ability.perishable and not context.card.ability.eternal and context.card.ability.set == 'Joker' then
+                local lock = tag.ID
+                G.CONTROLLER.locks[lock] = true
+                tag:yep('+', G.C.RED, function()
+                    context.card:set_perishable(true)
+                    big_juice(context.card)
+                    context.card:set_cost()
+                    G.CONTROLLER.locks[lock] = nil
+                    return true
+                end)
+                applied = true
+
+                tag.triggered = true
+            end
+            return applied
+        end
+    end,
+
+    pos = coordinate(9),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
+SMODS.Tag{ -- Rental
+    key = 'rental', loc_txt = loc.rental,
+
+    config = {type = 'store_joker_modify'},
+    loc_vars = function(self, info_queue)
+        info_queue[#info_queue+1] = {key = 'rental', set = 'Other', vars = {G.GAME.rental_rate or 1}}
+        return {}
+    end,
+
+    apply = function(tag, context)
+        if context.type == 'store_joker_modify' then
+            local applied = nil
+            if not context.card.ability.rental and context.card.ability.set == 'Joker' then
+                local lock = tag.ID
+                G.CONTROLLER.locks[lock] = true
+                tag:yep('+', G.C.RED, function()
+                    context.card:set_rental(true)
+                    big_juice(context.card)
+                    context.card:set_cost()
+                    G.CONTROLLER.locks[lock] = nil
+                    return true
+                end)
+                applied = true
+
+                tag.triggered = true
+            end
+            return applied
+        end
+    end,
+
+    pos = coordinate(10),
+    atlas = 'bunco_tags',
+
+    in_pool = function() return false end
+}
+
 -- Editions
 
 SMODS.Shader({key = 'glitter', path = 'glitter.fs'})
@@ -4086,7 +4302,7 @@ SMODS.Edition{
 
 SMODS.Atlas({key = 'bunco_vouchers', path = 'Vouchers/Vouchers.png', px = 71, py = 95})
 
-SMODS.Voucher{
+SMODS.Voucher{ -- Lamination
     key = 'lamination', loc_txt = loc.lamination,
 
     unlocked = true,
@@ -4095,14 +4311,60 @@ SMODS.Voucher{
     atlas = 'bunco_vouchers'
 }
 
-SMODS.Voucher{
+SMODS.Voucher{ -- Supercoating
     key = 'supercoating', loc_txt = loc.supercoating,
 
     requires = {'v_bunc_lamination'},
 
-    unlocked = true,
+    unlocked = false,
+
+    check_for_unlock = function(self, args)
+        if args.type == 'use_consumable_with_edition' and args.used_total >= 5 then
+            unlock_card(self)
+        end
+    end,
 
     pos = coordinate(2),
+    atlas = 'bunco_vouchers'
+}
+
+SMODS.Voucher{ -- Hedge Trimmer
+    key = 'hedge_trimmer', loc_txt = loc.hedge_trimmer,
+
+    config = {percent = 5},
+    loc_vars = function(self, info_queue)
+        return {vars = {self.config.percent}}
+    end,
+
+    unlocked = true,
+
+    pos = coordinate(3),
+    atlas = 'bunco_vouchers'
+}
+
+SMODS.Voucher{ -- Chainsaw
+    key = 'chainsaw', loc_txt = loc.chainsaw,
+
+    config = {percent = 20},
+    loc_vars = function(self, info_queue)
+        return {vars = {self.config.percent}}
+    end,
+
+    requires = {'v_bunc_hedge_trimmer'},
+
+    redeem = function(self)
+        G.GAME.starting_params.ante_scaling = (G.GAME.starting_params.ante_scaling / 100) * (100 - self.config.percent)
+    end,
+
+    unlocked = false,
+
+    check_for_unlock = function(self, args)
+        if args.type == 'hedge_trimmer_used' and args.used_total >= 20 then
+            unlock_card(self)
+        end
+    end,
+
+    pos = coordinate(4),
     atlas = 'bunco_vouchers'
 }
 
