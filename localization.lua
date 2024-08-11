@@ -1010,8 +1010,9 @@ return {
         ['en-us'] = {
             ['name'] = 'Bounty Hunter',
             ['text'] = {
-                [1] = '{C:mult}+#1#{} Mult for every {C:money}$',
-                [2] = 'below {C:money}$0'
+                [1] = '{C:mult}+#1#{} Mult for',
+                [2] = 'each {C:money}$1{} below {C:money}$0',
+                [3] = '{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)'
             },
             ['unlock'] = {
                 [1] = 'Have less than {E:1,C:attention}$-20',
@@ -1732,6 +1733,25 @@ return {
                 [1] = "Reduce blind's score using",
                 [2] = 'Hedge Trimmer',
                 [3] = 'a total of {C:attention,E:1}20{} times'
+            }
+        }
+    },
+    cups_n_balls = {
+        ['en-us'] = {
+            ['name'] = "Cups 'n' Balls",
+            ['text'] = {
+                [1] = '{C:attention}+1{} Booster Pack',
+                [2] = 'slot available in shop'
+            }
+        }
+    },
+    shell_game = {
+        ['en-us'] = {
+            ['name'] = 'Shell Game',
+            ['text'] = {
+                [1] = 'Reroll {C:attention}contents',
+                [2] = 'of Booster Packs',
+                [3] = '{C:attention}1{} time per pack'
             }
         }
     }
