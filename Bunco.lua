@@ -39,57 +39,14 @@
 -- Make so unlocks actually count things
 -- (done) Check blind flips beforehand (The Umbrella)
 -- (done) Running joke gives negative while the joker in shop
+-- Make configs apply immediately
 
 global_bunco = global_bunco or {loc = {}, vars = {}}
 local bunco = SMODS.current_mod
 local filesystem = NFS or love.filesystem
 
 local loc = filesystem.load(bunco.path..'localization.lua')()
-local config = filesystem.load(bunco.path..'config.lua')()
-
--- Shaders
-
-if config.high_quality_shaders then
-    local background_shader = NFS.read(bunco.path..'assets/shaders/background.fs')
-    local splash_shader = NFS.read(bunco.path..'assets/shaders/splash.fs')
-    local flame_shader = NFS.read(bunco.path..'assets/shaders/flame.fs')
-    G.SHADERS['background'] = love.graphics.newShader(background_shader)
-    G.SHADERS['splash'] = love.graphics.newShader(splash_shader)
-    G.SHADERS['flame'] = love.graphics.newShader(flame_shader)
-end
-
--- Custom high contrast
-
-if config.high_contrast then
-    SMODS.Atlas({key = 'cards_2', path = 'Resprites/EnhancedContrast.png', px = 71, py = 95})
-    SMODS.Atlas({key = 'ui_2', path = 'Resprites/EnhancedUIContrast.png', px = 18, py = 18})
-
-    local Game_start_up = Game.start_up
-    function Game:start_up()
-        Game_start_up(self)
-        G.C["SO_2"] = {
-            Hearts = HEX('ee151b'),
-            Diamonds = HEX('e56b10'),
-            Spades = HEX("5d55a6"),
-            Clubs = HEX("197f77"),
-        }
-    end
-
-    local new_colour_proto = G.C["SO_"..(G.SETTINGS.colourblind_option and 2 or 1)]
-    G.C.SUITS.Hearts = new_colour_proto.Hearts
-    G.C.SUITS.Diamonds = new_colour_proto.Diamonds
-    G.C.SUITS.Spades = new_colour_proto.Spades
-    G.C.SUITS.Clubs = new_colour_proto.Clubs
-    for k, v in pairs(G.I.SPRITE) do
-        if v.atlas and string.find(v.atlas.name, 'cards_') then
-            v.atlas = G.ASSET_ATLAS["cards_"..(G.SETTINGS.colourblind_option and 2 or 1)]
-        end
-    end
-end
-
--- Colorful Finishers
-
-if config.colorful_finishers then bunco_colorful_finishers = true end
+local config = bunco.config
 
 -- Debug message
 
@@ -174,6 +131,36 @@ end
 -- Config globals
 
 global_bunco.vars.jokerlike_consumable_editions = config.jokerlike_consumable_editions
+
+-- Config options
+
+function bunco.save_config(self)
+    SMODS.save_mod_config(self)
+end
+
+function bunco.config_tab()
+    return {n = G.UIT.ROOT, config = {r = 0.1, minw = 4, align = "tm", padding = 0.2, colour = G.C.BLACK}, nodes = {
+        create_toggle({label = loc.dictionary.colorful_finishers, ref_table = bunco.config, ref_value = 'colorful_finishers', callback = function() bunco:save_config() end}),
+        create_toggle({label = loc.dictionary.high_quality_shaders, ref_table = bunco.config, ref_value = 'high_quality_shaders', callback = function() bunco:save_config() end}),
+        create_toggle({label = loc.dictionary.double_lovers, ref_table = bunco.config, ref_value = 'double_lovers', callback = function() bunco:save_config() end}),
+        create_toggle({label = loc.dictionary.jokerlike_consumable_editions, ref_table = bunco.config, ref_value = 'jokerlike_consumable_editions', callback = function() bunco:save_config() end})
+    }}
+end
+
+-- Shaders
+
+if config.high_quality_shaders then
+    local background_shader = NFS.read(bunco.path..'assets/shaders/background.fs')
+    local splash_shader = NFS.read(bunco.path..'assets/shaders/splash.fs')
+    local flame_shader = NFS.read(bunco.path..'assets/shaders/flame.fs')
+    G.SHADERS['background'] = love.graphics.newShader(background_shader)
+    G.SHADERS['splash'] = love.graphics.newShader(splash_shader)
+    G.SHADERS['flame'] = love.graphics.newShader(flame_shader)
+end
+
+-- Colorful Finishers
+
+if config.colorful_finishers then bunco_colorful_finishers = true end
 
 -- Double lovers
 
@@ -3605,7 +3592,6 @@ SMODS.Blind{ -- The Blade
     loc_vars = function(self)
         local overscore = get_blind_amount(G.GAME.round_resets.ante)*G.P_BLINDS.bl_bunc_blade.mult*G.GAME.starting_params.ante_scaling
         overscore = number_format(overscore * 1.5)
-        say(G.GAME.round_resets.ante..' '..G.GAME.blind.mult..' '..G.GAME.starting_params.ante_scaling..' '..overscore)
         return {vars = {overscore}}
     end,
     process_loc_text = function(self)
