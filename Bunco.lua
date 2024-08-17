@@ -141,8 +141,14 @@ end
 function bunco.config_tab()
     return {n = G.UIT.ROOT, config = {r = 0.1, minw = 4, align = "tm", padding = 0.2, colour = G.C.BLACK}, nodes = {
         create_toggle({label = loc.dictionary.colorful_finishers, ref_table = bunco.config, ref_value = 'colorful_finishers', callback = function() bunco:save_config() end}),
-        create_toggle({label = loc.dictionary.high_quality_shaders, ref_table = bunco.config, ref_value = 'high_quality_shaders', callback = function() bunco:save_config() end}),
-        create_toggle({label = loc.dictionary.double_lovers, ref_table = bunco.config, ref_value = 'double_lovers', callback = function() bunco:save_config() end}),
+        create_toggle({label = loc.dictionary.high_quality_shaders, info = {loc.dictionary.requires_restart}, ref_table = bunco.config, ref_value = 'high_quality_shaders', callback = function() bunco:save_config() end}),
+        create_toggle({label = loc.dictionary.double_lovers, ref_table = bunco.config, ref_value = 'double_lovers', callback = function() bunco:save_config()
+            if config.double_lovers then
+                G.P_CENTERS.c_lovers.config.max_highlighted = 2
+            else
+                G.P_CENTERS.c_lovers.config.max_highlighted = 1
+            end
+        end}),
         create_toggle({label = loc.dictionary.jokerlike_consumable_editions, ref_table = bunco.config, ref_value = 'jokerlike_consumable_editions', callback = function() bunco:save_config() end})
     }}
 end
@@ -201,6 +207,16 @@ function Game:update(dt)
         end
     end
 
+    -- Reactive
+
+    if G.jokers then
+        for i = 1, #G.jokers.cards do
+            if G.jokers.cards[i].ability.bunc_reactive then
+                G.GAME.blind:debuff_card(G.jokers.cards[i])
+            end
+        end
+    end
+
     original_game_update(self, dt)
 end
 
@@ -245,6 +261,14 @@ function bunco.set_debuff(card)
             if G.jokers.cards[i].ability.extra.joker ~= 0 and card == G.jokers.cards[i].ability.extra.joker then
                 return true
             end
+        end
+    end
+
+    -- Reactive
+
+    for i = 1, #G.jokers.cards do
+        if card == G.jokers.cards[i] and G.jokers.cards[i].ability.bunc_reactive and (G.jokers.cards[i].ability.bunc_reactive_tally or 0) <= 0 then
+            return true
         end
     end
 
@@ -1088,7 +1112,7 @@ create_joker({ -- Carnival
                 end
                 local joker_to_destroy = #destructable_jokers > 0 and pseudorandom_element(destructable_jokers, pseudoseed('carnival')) or nil
 
-                if joker_to_destroy and not card.getting_sliced then 
+                if joker_to_destroy and not card.getting_sliced then
                     joker_to_destroy.getting_sliced = true
                     card:juice_up(0.8, 0.8)
                     card.ability.extra.ante = G.GAME.round_resets.ante
@@ -2147,7 +2171,7 @@ create_joker({ -- Doodle
 create_joker({ -- Disproportionality
     name = 'Disproportionality', position = 45,
     vars = {{min = 0}, {max = 200}},
-    custom_vars = function(self, info_queue, card)  
+    custom_vars = function(self, info_queue, card)
         local r_chips = {}
         for i = card.ability.extra.min, card.ability.extra.max do
             r_chips[#r_chips + 1] = string.format("%03d", i)
@@ -2689,7 +2713,7 @@ create_joker({ -- ROYGBIV
 
                     if cards and #cards > 0 then
                         big_juice(card)
-                        cards[math.random(#cards)]:set_edition({polychrome = true}, true) 
+                        cards[math.random(#cards)]:set_edition({polychrome = true}, true)
                     end
                 end
             end
@@ -4379,6 +4403,61 @@ SMODS.Voucher{ -- Shell Game
 
     pos = coordinate(6),
     atlas = 'bunco_vouchers'
+}
+
+-- Stickers
+
+SMODS.Atlas({key = 'bunco_stickers', path = 'Stickers/Stickers.png', px = 71, py = 95})
+
+SMODS.Sticker{ -- Scattering
+    key = 'scattering', loc_txt = loc.scattering,
+
+    badge_colour = HEX('9eacbe'),
+
+    order = 5,
+
+    pos = coordinate(1),
+    atlas = 'bunco_stickers'
+}
+
+SMODS.Sticker{ -- Hindered
+    key = 'hindered', loc_txt = loc.hindered,
+
+    apply = function(self, card, val)
+        card.ability[self.key] = val
+        card.ability.bunc_hindered_sold = false
+    end,
+
+    badge_colour = HEX('e97720'),
+
+    order = 6,
+
+    pos = coordinate(2),
+    atlas = 'bunco_stickers'
+}
+
+SMODS.Sticker{ -- Reactive
+    key = 'reactive', loc_txt = loc.reactive,
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.bunc_reactive_tally or 1}}
+    end,
+
+    apply = function(self, card, val)
+        card.ability[self.key] = val
+        if val then
+            card.ability[self.key..'_tally'] = 1
+        else
+            card.ability[self.key..'_tally'] = nil
+        end
+    end,
+
+    badge_colour = HEX('8238c3'),
+
+    order = 7,
+
+    pos = coordinate(3),
+    atlas = 'bunco_stickers'
 }
 
 -- Mod compatibility
